@@ -12,13 +12,19 @@ async function initDb() {
   const prisma = new PrismaClient();
   try {
     await prisma.$connect();
+    await prisma.corridaAberta.count();
     console.log('✅ Banco de dados conectado');
-    await prisma.$disconnect();
   } catch(e) {
     console.log('📦 Criando tabelas no banco...');
     const { execSync } = await import('child_process');
-    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
-    console.log('✅ Tabelas criadas!');
+    try {
+      execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit', env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL } });
+      console.log('✅ Tabelas criadas!');
+    } catch(err) {
+      console.error('❌ Erro ao criar tabelas:', err.message);
+    }
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
