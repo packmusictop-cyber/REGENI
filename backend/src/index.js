@@ -1,13 +1,12 @@
 import { config } from "dotenv";
-config({ path: ".env" });
+if (process.env.RAILWAY_ENVIRONMENT_NAME) config({ path: ".env" });
 
 process.on("unhandledRejection", e => { console.error("❌ ERRO FATAL:", e); });
 process.on("uncaughtException", e => { console.error("❌ CRASH:", e); });
 
-const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_AWS || process.env.DATABASE_URL_RENDER;
+const dbUrl = process.env.DATABASE_URL;
 if (!dbUrl) { 
   console.error("❌ DATABASE_URL não configurada!"); 
-  console.log("Available env:", Object.keys(process.env).filter(k => k.includes('DATABASE') || k.includes('URL')));
   process.exit(1); 
 }
 
