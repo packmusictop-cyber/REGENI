@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>REGENI — Entrar</title>
+<meta name="description" content="Entre no REGENI. Corrida, longevidade e performance num só app.">
+<link rel="manifest" href="/manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--c:#CCFF00;--c2:rgba(204,255,0,.12);--bg:#0a0a0a;--bg2:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#556677;--fn:'DM Sans',system-ui,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--fn)}
+
+/* ═══ TELAS ═══ */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;transition:opacity .4s,transform .4s;will-change:opacity,transform;overflow-y:auto;overflow-x:hidden}
+.screen.hidden{opacity:0;pointer-events:none;transform:translateY(20px)}
+
+/* ═══ BACKGROUND ═══ */
+.bg-glow{position:fixed;top:-20%;left:0;width:100%;height:60%;background:radial-gradient(ellipse,rgba(204,255,0,.04) 0%,transparent 70%);pointer-events:none;z-index:0;overflow:hidden}
+.bg-dots{position:fixed;inset:0;background-image:radial-gradient(rgba(204,255,0,.04) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;z-index:0}
+
+/* ═══ ONBOARDING ═══ */
+#screen-onboard{z-index:10;background:var(--bg)}
+.ob-container{flex:1;display:flex;flex-direction:column;position:relative}
+.ob-slides{display:flex;width:300%;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);max-width:300vw}
+.ob-slide{width:33.333%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center}
+.ob-visual{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:28px;position:relative}
+.ob-visual::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:1.5px solid;animation:pulse-ring 3s ease-in-out infinite}
+.ob-v1{background:var(--c2)}.ob-v1::after{border-color:rgba(204,255,0,.22)}
+.ob-v2{background:#27AE6011}.ob-v2::after{border-color:#27AE6022}
+.ob-v3{background:#2980B911}.ob-v3::after{border-color:#2980B922}
+@keyframes pulse-ring{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.5}}
+
+.ob-title{font-size:26px;font-weight:800;line-height:1.15;margin-bottom:12px;color:#fff}
+.ob-title span{color:var(--c)}
+.ob-desc{font-size:14px;color:var(--muted);line-height:1.6;max-width:320px}
+
+.ob-nav{padding:20px 32px 40px;display:flex;align-items:center;justify-content:space-between}
+.ob-dots{display:flex;gap:8px}
+.dot{width:8px;height:8px;border-radius:4px;background:#2a2a2a;transition:all .3s}
+.dot.on{width:24px;background:var(--c)}
+.ob-skip{color:var(--muted);font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;padding:8px;font-family:var(--fn)}
+.ob-next{background:var(--c);color:#000;font-weight:700;border:none;padding:12px 28px;border-radius:12px;font-size:14px;cursor:pointer;font-family:var(--fn);transition:transform .2s}
+.ob-next:active{transform:scale(.96)}
+
+/* ═══ AUTH SCREEN ═══ */
+#screen-auth{z-index:10}
+.auth-scroll{flex:1;display:flex;flex-direction:column;align-items:center;padding:40px 24px 120px;position:relative;z-index:1}
+
+.auth-logo{font-size:36px;font-weight:800;color:var(--c);letter-spacing:6px;margin-bottom:2px}
+.auth-logo-sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-bottom:32px}
+
+/* Tabs */
+.auth-tabs{display:flex;background:#141414;border:1px solid var(--border);border-radius:14px;padding:4px;width:100%;max-width:380px;margin-bottom:24px}
+.auth-tab{flex:1;text-align:center;padding:12px;font-size:14px;font-weight:700;color:var(--muted);border-radius:10px;cursor:pointer;transition:all .3s;border:none;background:none;font-family:var(--fn)}
+.auth-tab.on{background:var(--c);color:#000}
+
+/* Form */
+.auth-form{width:100%;max-width:380px}
+.form-panel{display:none}
+.form-panel.on{display:block}
+
+.field{margin-bottom:16px}
+.field-label{display:block;font-size:12px;font-weight:600;color:#8899bb;margin-bottom:6px;letter-spacing:.5px}
+.field-input{width:100%;background:#141414;border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--text);font-family:var(--fn);outline:none;transition:border-color .3s}
+.field-input:focus{border-color:var(--c)}
+.field-input::placeholder{color:#445566}
+.field-input.error{border-color:#E74C3C}
+
+.error-msg{font-size:11px;color:#E74C3C;margin-top:4px;display:none;font-weight:500}
+.error-msg.show{display:block}
+
+.strength-bar{height:3px;background:#2a2a2a;border-radius:2px;margin-top:6px;overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;width:0;transition:all .3s}
+
+/* Tipo cards */
+.tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.tipo-card{background:#141414;border:1.5px solid var(--border);border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .3s}
+.tipo-card:hover{border-color:rgba(204,255,0,.4)}
+.tipo-card.on{border-color:var(--c);background:var(--c2)}
+.tipo-card .ico{font-size:28px;margin-bottom:6px}
+.tipo-card .label{display:block;font-size:14px;font-weight:700;color:#fff}
+.tipo-card .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+
+/* Buttons */
+.btn-submit{width:100%;padding:16px;border-radius:14px;font-size:16px;font-weight:800;border:none;cursor:pointer;font-family:var(--fn);transition:all .3s;position:relative;overflow:hidden}
+.btn-submit:active{transform:scale(.98)}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed}
+.btn-main-orange{background:var(--c);color:#000}
+.btn-main-orange:hover:not(:disabled){box-shadow:0 0 30px rgba(204,255,0,.3)}
+
+.spinner{display:none;width:20px;height:20px;border:2.5px solid #00000033;border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:#445566;font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#2a2a2a}
+
+.btn-google{width:100%;padding:14px;border-radius:12px;font-size:14px;font-weight:600;border:1.5px solid var(--border);background:#141414;color:#c0ccdd;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color .3s}
+.btn-google:hover{border-color:rgba(204,255,0,.4)}
+
+.btn-strava{width:100%;padding:14px;border-radius:12px;font-size:14px;font-weight:600;border:none;background:#FC4C02;color:#fff;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .2s;margin-top:8px}
+.btn-strava:active{transform:scale(.98)}
+
+.forgot{text-align:right;margin-bottom:16px}
+.forgot a{font-size:12px;color:var(--muted);text-decoration:none;font-weight:500}
+.forgot a:hover{color:var(--c)}
+
+.terms{text-align:center;font-size:11px;color:#556677;margin-top:16px;line-height:1.5}
+.terms a{color:var(--c);text-decoration:none}
+
+.bonus-box{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--c2);border:1px solid rgba(204,255,0,.22);border-radius:12px;padding:12px;margin-top:12px}
+.bonus-box span:first-child{font-size:20px}
+.bonus-box span:last-child{font-size:12px;color:var(--c);font-weight:700}
+
+/* ═══ SUCESSO ═══ */
+#screen-sucesso{z-index:20;background:var(--bg);justify-content:center;align-items:center}
+.suc-wrap{text-align:center;padding:32px;position:relative;z-index:1}
+.suc-icon{font-size:72px;margin-bottom:16px;animation:bounce-in .6s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes bounce-in{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.suc-xp{background:var(--c);color:#000;font-size:14px;font-weight:800;padding:6px 20px;border-radius:20px;display:inline-block;margin-bottom:16px}
+.suc-title{font-size:32px;font-weight:800;line-height:1.2;margin-bottom:8px}
+.suc-title span{color:var(--c)}
+.suc-sub{font-size:14px;color:#8899bb;line-height:1.6;max-width:320px;margin:0 auto 24px}
+
+.achievements{display:flex;justify-content:center;gap:16px;margin-bottom:32px}
+.ach{text-align:center}
+.ach-ico{width:52px;height:52px;background:#141414;border:1.5px solid rgba(204,255,0,.4);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 6px}
+.ach-label{font-size:10px;color:var(--muted);font-weight:600}
+
+.btn-go{background:var(--c);color:#000;font-weight:800;padding:18px 40px;border-radius:16px;font-size:16px;border:none;cursor:pointer;font-family:var(--fn);transition:transform .2s}
+.btn-go:active{transform:scale(.96)}
+
+/* Confetti */
+.confete{position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden}
+.c-p{position:absolute;animation:confetti-fall linear forwards}
+@keyframes confetti-fall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);z-index:100}
+.toast{background:#141414;border:1px solid var(--border);color:var(--text);padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.error{border-color:#E74C3C44;color:#E74C3C}
+
+/* Security badge */
+.security{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;opacity:.6}
+.security svg{width:14px;height:14px}
+.security span{font-size:10px;color:var(--muted)}
+
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px;z-index:2}
+
+/* Nav */
+.rg-bottom-nav{position:fixed;bottom:0;left:0;right:0;height:64px;background:rgba(10,10,10,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom,0px);z-index:1000}
+.rg-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#556677;font-size:10px;font-weight:700;font-family:var(--fn);letter-spacing:.3px;transition:color .2s;padding:4px 0}
+.rg-nav-item span:first-child{font-size:22px;line-height:1}
+.rg-nav-item.active,.rg-nav-item:hover{color:var(--c)}
+
+@media(max-width:380px){
+  .auth-scroll{padding:32px 16px 120px}
+  .ob-title{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-dots"></div>
+
+<!-- ═══════════════════════════════════
+     TELA 1: ONBOARDING (3 slides)
+═══════════════════════════════════ -->
+<div class="screen" id="screen-onboard">
+  <div class="ob-container">
+    <div class="ob-slides" id="obSlides">
+
+      <div class="ob-slide">
+        <div class="ob-visual ob-v1">🏃</div>
+        <div class="ob-title">Corra com <span>inteligência</span></div>
+        <div class="ob-desc">Ranking nacional, calendário de corridas, GPS, comunidades e tudo que um corredor precisa — num só app.</div>
+      </div>
+
+      <div class="ob-slide">
+        <div class="ob-visual ob-v2">🤖</div>
+        <div class="ob-title">IA que te <span>conhece</span></div>
+        <div class="ob-desc">Sua treinadora pessoal sabe seu VDOT, zonas de FC, sono, alimentação e medicação. Cada resposta é baseada nos seus dados reais.</div>
+      </div>
+
+      <div class="ob-slide">
+        <div class="ob-visual ob-v3">🧬</div>
+        <div class="ob-title">Reduza sua <span>idade biológica</span></div>
+        <div class="ob-desc">Protocolos baseados em Bryan Johnson, Peter Attia e estudos publicados. Acompanhe com exames reais e dados de composição corporal.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="ob-nav">
+    <button class="ob-skip" onclick="irParaAuth()">Pular</button>
+    <div class="ob-dots">
+      <div class="dot on" onclick="goSlide(0)"></div>
+      <div class="dot" onclick="goSlide(1)"></div>
+      <div class="dot" onclick="goSlide(2)"></div>
+    </div>
+    <button class="ob-next" id="obNext" onclick="nextSlide()">Próximo</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     TELA 2: LOGIN / CADASTRO
+═══════════════════════════════════ -->
+<div class="screen hidden" id="screen-auth">
+  <div class="auth-scroll">
+
+    <div class="auth-logo">REGENI</div>
+    <div class="auth-logo-sub">B R A Z I L</div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="tabLogin" onclick="switchTab('login')">Entrar</button>
+      <button class="auth-tab" id="tabCadastro" onclick="switchTab('cadastro')">Criar Conta</button>
+    </div>
+
+    <div class="auth-form">
+
+      <!-- ── FORM LOGIN ── -->
+      <div class="form-panel on" id="panelLogin">
+        <div class="field">
+          <label class="field-label">EMAIL</label>
+          <input class="field-input" id="loginEmail" type="email" placeholder="seu@email.com" autocomplete="email" inputmode="email">
+          <div class="error-msg" id="errLoginEmail">Email inválido</div>
+        </div>
+        <div class="field">
+          <label class="field-label">SENHA</label>
+          <div style="position:relative">
+            <input class="field-input" id="loginSenha" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px">
+            <button type="button" class="eye-btn" onclick="toggleSenha('loginSenha','eyeLogin')" tabindex="-1"><span id="eyeLogin">👁</span></button>
+          </div>
+          <div class="error-msg" id="errLoginSenha">Senha incorreta</div>
+        </div>
+        <div class="forgot">
+          <a href="javascript:void(0)" onclick="abrirRecuperarSenha()">Esqueci minha senha</a>
+        </div>
+        <button class="btn-submit btn-main-orange" id="btnLogin" onclick="fazerLogin()">
+          <span id="loginTxt">Entrar</span>
+          <div class="spinner" id="loginSpinner"></div>
+        </button>
+
+        <div class="security" style="margin-top:20px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#667788" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+          <span>Conexão segura · Dados criptografados</span>
+        </div>
+        <p style="text-align:center;font-size:12px;color:#556677;margin-top:14px;line-height:1.6">
+          Esqueceu a senha? Envie email para
+          <a href="mailto:contatoregeni@proton.me" style="color:var(--c);text-decoration:none">contatoregeni@proton.me</a>
+        </p>
+      </div>
+
+      <!-- ── FORM CADASTRO ── -->
+      <div class="form-panel" id="panelCadastro">
+
+        <div class="field">
+          <label class="field-label">NOME COMPLETO *</label>
+          <input class="field-input" id="cadNome" type="text" placeholder="Seu nome completo" autocomplete="name" maxlength="120">
+          <div class="error-msg" id="errCadNome">Nome obrigatório (3–120 chars)</div>
+          <div style="font-size:11px;color:#E67E22;margin-top:4px">⚠️ Não poderá ser alterado. Digite correto.</div>
+        </div>
+        <div class="field">
+          <label class="field-label">EMAIL *</label>
+          <input class="field-input" id="cadEmail" type="email" placeholder="seu@email.com" autocomplete="email" inputmode="email">
+          <div class="error-msg" id="errCadEmail">Email inválido</div>
+        </div>
+        <div class="field">
+          <label class="field-label">SENHA * <span style="font-size:10px;font-weight:400;color:var(--muted)">(mín. 6 caracteres)</span></label>
+          <div style="position:relative">
+            <input class="field-input" id="cadSenha" type="password" placeholder="Mínimo 6 caracteres" oninput="checkSenha(this.value)" autocomplete="new-password" style="padding-right:44px">
+            <button type="button" class="eye-btn" onclick="toggleSenha('cadSenha','eyeCad')" tabindex="-1"><span id="eyeCad">👁</span></button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <div class="error-msg" id="errCadSenha">Mínimo 6 caracteres</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">DATA DE NASCIMENTO *</label>
+          <input class="field-input" id="cadBirthDate" type="date" autocomplete="bday">
+          <div class="error-msg" id="errCadBirth">Data inválida ou idade fora do intervalo (13–120 anos)</div>
+          <div style="font-size:11px;color:#E67E22;margin-top:4px">⚠️ Não poderá ser alterada</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">GÊNERO *</label>
+          <div style="display:flex;gap:12px;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text)">
+              <input type="radio" name="cadGender" value="M" style="accent-color:var(--c);width:16px;height:16px"> Masculino
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text)">
+              <input type="radio" name="cadGender" value="F" style="accent-color:var(--c);width:16px;height:16px"> Feminino
+            </label>
+          </div>
+          <div class="error-msg" id="errCadGender">Selecione o gênero</div>
+          <div style="font-size:11px;color:#E67E22;margin-top:4px">⚠️ Não poderá ser alterado</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">CIDADE *</label>
+          <input class="field-input" id="cadCity" type="text" placeholder="Sua cidade" autocomplete="address-level2">
+          <div class="error-msg" id="errCadCity">Cidade obrigatória</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">ESTADO *</label>
+          <select class="field-input" id="cadState">
+            <option value="">Selecione</option>
+            <option value="AC">Acre</option><option value="AL">Alagoas</option>
+            <option value="AP">Amapá</option><option value="AM">Amazonas</option>
+            <option value="BA">Bahia</option><option value="CE">Ceará</option>
+            <option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option>
+            <option value="GO">Goiás</option><option value="MA">Maranhão</option>
+            <option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option>
+            <option value="MG">Minas Gerais</option><option value="PA">Pará</option>
+            <option value="PB">Paraíba</option><option value="PR">Paraná</option>
+            <option value="PE">Pernambuco</option><option value="PI">Piauí</option>
+            <option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option>
+            <option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option>
+            <option value="RR">Roraima</option><option value="SC">Santa Catarina</option>
+            <option value="SP">São Paulo</option><option value="SE">Sergipe</option>
+            <option value="TO">Tocantins</option>
+          </select>
+          <div class="error-msg" id="errCadState">Selecione o estado</div>
+        </div>
+
+        <div class="field" style="margin-top:8px">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;color:#8899bb;line-height:1.5">
+            <input type="checkbox" id="cadTermos" style="accent-color:var(--c);width:16px;height:16px;flex-shrink:0;margin-top:2px">
+            Li e aceito os <a href="/termos.html" target="_blank" style="color:var(--c);text-decoration:none">Termos de Uso</a> e a
+            <a href="/privacidade.html" target="_blank" style="color:var(--c);text-decoration:none">Política de Privacidade</a>
+          </label>
+          <div class="error-msg" id="errCadTermos">Aceite os termos para continuar</div>
+        </div>
+
+        <button class="btn-submit btn-main-orange" id="btnCadastro" onclick="fazerCadastro()" style="margin-top:16px">
+          <span id="cadTxt">Criar Conta Grátis</span>
+          <div class="spinner" id="cadSpinner"></div>
+        </button>
+
+        <div class="security" style="margin-top:16px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#667788" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+          <span>Conexão segura · 100% gratuito · Sem spam</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     TELA 3: SUCESSO
+═══════════════════════════════════ -->
+<div class="screen hidden" id="screen-sucesso">
+  <div class="confete" id="confete"></div>
+  <div class="suc-wrap">
+    <div class="suc-icon" id="sucIco">🎉</div>
+    <div class="suc-xp" id="sucXp">⚡ +50 XP</div>
+    <h2 class="suc-title">Bem-vindo ao<br><span>REGENI!</span></h2>
+    <p class="suc-sub" id="sucSub">Sua jornada começa agora.</p>
+    <div class="achievements">
+      <div class="ach">
+        <div class="ach-ico">🏃</div>
+        <div class="ach-label">1º Login</div>
+      </div>
+      <div class="ach">
+        <div class="ach-ico">⚡</div>
+        <div class="ach-label">Conta Criada</div>
+      </div>
+      <div class="ach">
+        <div class="ach-ico">🌟</div>
+        <div class="ach-label">Early Adopter</div>
+      </div>
+    </div>
+    <button class="btn-go" id="btnComecar" onclick="irParaDashboard()">
+      Entrar no App →
+    </button>
+  </div>
+</div>
+
+<!-- MODAL RECUPERAR SENHA -->
+<div id="modalRecuperar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)">
+  <div style="background:#111;border:1px solid #1e1e1e;border-radius:18px;width:100%;max-width:400px;overflow:hidden">
+    <div style="padding:18px 22px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:17px;font-weight:700">🔑 Recuperar Senha</div>
+      <button onclick="fecharRecuperarSenha()" style="background:none;border:none;color:#667788;font-size:20px;cursor:pointer;padding:4px;line-height:1">✕</button>
+    </div>
+    <div id="rec-step1" style="padding:22px">
+      <p style="font-size:13px;color:#8899bb;margin-bottom:16px;line-height:1.6">Use as <strong style="color:#e2e8f0">12 palavras de recuperação</strong> que você recebeu ao criar sua conta para redefinir a senha.</p>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;color:#667788;text-transform:uppercase;letter-spacing:.5px;font-weight:600;display:block;margin-bottom:5px">Email da conta</label>
+        <input id="recEmail" type="email" placeholder="seu@email.com" autocomplete="email" style="width:100%;background:#1a1a1a;border:1px solid #1e1e1e;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:13px;outline:none;transition:border .2s" onfocus="this.style.borderColor='#CCFF00'" onblur="this.style.borderColor='#1e1e1e'">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;color:#667788;text-transform:uppercase;letter-spacing:.5px;font-weight:600;display:block;margin-bottom:5px">12 Palavras de Recuperação</label>
+        <textarea id="recBip39" placeholder="palavra1 palavra2 palavra3 ... palavra12" rows="3" style="width:100%;background:#1a1a1a;border:1px solid #1e1e1e;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:13px;outline:none;resize:vertical;font-family:inherit;line-height:1.5;transition:border .2s" onfocus="this.style.borderColor='#CCFF00'" onblur="this.style.borderColor='#1e1e1e'"></textarea>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;color:#667788;text-transform:uppercase;letter-spacing:.5px;font-weight:600;display:block;margin-bottom:5px">Nova Senha</label>
+        <input id="recSenhaNova" type="password" placeholder="Mín. 8 chars, 1 maiúscula, 1 número, 1 especial" autocomplete="new-password" style="width:100%;background:#1a1a1a;border:1px solid #1e1e1e;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:13px;outline:none;transition:border .2s" onfocus="this.style.borderColor='#CCFF00'" onblur="this.style.borderColor='#1e1e1e'">
+      </div>
+      <div id="recErro" style="display:none;font-size:12px;color:#ff1744;margin-bottom:10px;padding:8px 12px;background:#ff174410;border-radius:6px"></div>
+      <button onclick="enviarRecuperacao()" id="recBtn" style="width:100%;padding:13px;border-radius:10px;background:#CCFF00;color:#000;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:opacity .2s">Redefinir Senha</button>
+      <p style="font-size:11px;color:#556677;margin-top:12px;text-align:center">Não tem as palavras? <a href="mailto:contatoregeni@proton.me" style="color:#CCFF00;text-decoration:none">contatoregeni@proton.me</a></p>
+    </div>
+    <div id="rec-step2" style="display:none;padding:28px;text-align:center">
+      <div style="font-size:56px;margin-bottom:14px">✅</div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">Senha redefinida!</div>
+      <p style="font-size:13px;color:#8899bb;margin-bottom:20px">Você já pode entrar com sua nova senha.</p>
+      <button onclick="fecharRecuperarSenha()" style="padding:12px 28px;border-radius:10px;background:#CCFF00;color:#000;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit">Fazer Login →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap"><div class="toast" id="toastEl"></div></div>
+
+<!-- NAV -->
+<nav class="rg-bottom-nav">
+  <a href="/" class="rg-nav-item"><span>🏠</span><span>Início</span></a>
+  <a href="/resultados.html" class="rg-nav-item"><span>🔍</span><span>Resultados</span></a>
+  <a href="/atleta.html" class="rg-nav-item"><span>👤</span><span>Atleta</span></a>
+  <a href="/corridas-abertas.html" class="rg-nav-item"><span>🏁</span><span>Corridas</span></a>
+</nav>
+
+<script>
+// ═══════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════
+let slideAtual = 0;
+
+function goSlide(n) {
+  slideAtual = n;
+  document.getElementById('obSlides').style.transform = 'translateX(-' + (n * 33.333) + '%)';
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === n));
+  document.getElementById('obNext').textContent = n === 2 ? 'Começar' : 'Próximo';
+}
+
+function nextSlide() {
+  if (slideAtual < 2) goSlide(slideAtual + 1);
+  else irParaAuth();
+}
+
+// Swipe
+let touchX = 0;
+document.getElementById('obSlides').addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+document.getElementById('obSlides').addEventListener('touchend', e => {
+  const diff = touchX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) {
+    if (diff > 0 && slideAtual < 2) goSlide(slideAtual + 1);
+    else if (diff < 0 && slideAtual > 0) goSlide(slideAtual - 1);
+  }
+});
+
+function irParaAuth() {
+  document.getElementById('screen-onboard').classList.add('hidden');
+  document.getElementById('screen-auth').classList.remove('hidden');
+  localStorage.setItem('pace_ob_done', '1');
+}
+
+// Pular onboarding se já viu
+if (localStorage.getItem('pace_ob_done')) irParaAuth();
+
+// Pular direto se já logado
+if (localStorage.getItem('pace_token')) irParaDashboard();
+
+// ═══════════════════════════════
+// TABS
+// ═══════════════════════════════
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tabLogin').classList.toggle('on', isLogin);
+  document.getElementById('tabCadastro').classList.toggle('on', !isLogin);
+  document.getElementById('panelLogin').classList.toggle('on', isLogin);
+  document.getElementById('panelCadastro').classList.toggle('on', !isLogin);
+  // Limpar erros
+  document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.field-input').forEach(e => e.classList.remove('error'));
+}
+
+// Check URL params
+const params = new URLSearchParams(window.location.search);
+if (params.get('tab') === 'cadastro' || params.get('cadastro') || params.get('plan') || params.get('role')) {
+  switchTab('cadastro');
+  if (params.get('role') === 'coach') setTipo('treinador');
+}
+
+// ═══════════════════════════════
+// TIPO ATLETA/TREINADOR
+// ═══════════════════════════════
+let tipoSelecionado = 'atleta';
+
+function setTipo(tipo) {
+  tipoSelecionado = tipo;
+  document.getElementById('tipoAtleta').classList.toggle('on', tipo === 'atleta');
+  document.getElementById('tipoTreinador').classList.toggle('on', tipo === 'treinador');
+}
+
+// ═══════════════════════════════
+// PASSWORD STRENGTH
+// ═══════════════════════════════
+function checkSenha(val) {
+  const fill = document.getElementById('strengthFill');
+  let str = 0;
+  if (val.length >= 6) str++;
+  if (val.length >= 8) str++;
+  if (/[A-Z]/.test(val)) str++;
+  if (/[0-9]/.test(val)) str++;
+  if (/[^a-zA-Z0-9]/.test(val)) str++;
+
+  const pct = [0, 20, 40, 60, 80, 100][str];
+  const cor = ['#E74C3C', '#E74C3C', '#CCFF00', '#CCFF00', '#27AE60', '#27AE60'][str];
+  fill.style.width = pct + '%';
+  fill.style.background = cor;
+}
+
+// ═══════════════════════════════
+// TOGGLE SENHA
+// ═══════════════════════════════
+function toggleSenha(inputId, eyeId) {
+  const input = document.getElementById(inputId);
+  const eye   = document.getElementById(eyeId);
+  if (input.type === 'password') { input.type = 'text';     eye.textContent = '🙈'; }
+  else                           { input.type = 'password'; eye.textContent = '👁'; }
+}
+
+// ═══════════════════════════════
+// LOGIN
+// ═══════════════════════════════
+async function fazerLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginSenha').value;
+  let ok = true;
+
+  document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.field-input').forEach(e => e.classList.remove('error'));
+
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    document.getElementById('errLoginEmail').classList.add('show');
+    document.getElementById('loginEmail').classList.add('error');
+    ok = false;
+  }
+  if (!password) {
+    document.getElementById('errLoginSenha').classList.add('show');
+    document.getElementById('loginSenha').classList.add('error');
+    ok = false;
+  }
+  if (!ok) return;
+
+  setLoading('login', true);
+  try {
+    const res = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Email ou senha incorretos');
+
+    localStorage.setItem('pace_token', data.token);
+    localStorage.setItem('pace_user', JSON.stringify(data.user || {}));
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user || {}));
+    localStorage.setItem('pace_ob_done', '1');
+
+    mostrarSucesso(data.user, false);
+  } catch (e) {
+    document.getElementById('errLoginSenha').textContent = e.message;
+    document.getElementById('errLoginSenha').classList.add('show');
+    document.getElementById('loginSenha').classList.add('error');
+  } finally {
+    setLoading('login', false);
+  }
+}
+
+// ═══════════════════════════════
+// CADASTRO
+// ═══════════════════════════════
+async function fazerCadastro() {
+  const name      = document.getElementById('cadNome').value.trim();
+  const email     = document.getElementById('cadEmail').value.trim().toLowerCase();
+  const password  = document.getElementById('cadSenha').value;
+  const birthDate = document.getElementById('cadBirthDate').value;
+  const genderEl  = document.querySelector('input[name="cadGender"]:checked');
+  const city      = document.getElementById('cadCity').value.trim();
+  const state     = document.getElementById('cadState').value;
+  const termos    = document.getElementById('cadTermos').checked;
+  let ok = true;
+
+  document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.field-input').forEach(e => e.classList.remove('error'));
+
+  if (!name || name.length < 3) {
+    document.getElementById('errCadNome').classList.add('show');
+    document.getElementById('cadNome').classList.add('error');
+    ok = false;
+  }
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    document.getElementById('errCadEmail').classList.add('show');
+    document.getElementById('cadEmail').classList.add('error');
+    ok = false;
+  }
+  if (!password || password.length < 6) {
+    document.getElementById('errCadSenha').classList.add('show');
+    document.getElementById('cadSenha').classList.add('error');
+    ok = false;
+  }
+  if (birthDate) {
+    const idade = Math.floor((Date.now() - new Date(birthDate)) / (365.25*24*60*60*1000));
+    if (idade < 13 || idade > 120) {
+      document.getElementById('errCadBirth').classList.add('show');
+      document.getElementById('cadBirthDate').classList.add('error');
+      ok = false;
+    }
+  } else {
+    document.getElementById('errCadBirth').classList.add('show');
+    document.getElementById('cadBirthDate').classList.add('error');
+    ok = false;
+  }
+  if (!genderEl) {
+    document.getElementById('errCadGender').classList.add('show');
+    ok = false;
+  }
+  if (!city) {
+    document.getElementById('errCadCity').classList.add('show');
+    document.getElementById('cadCity').classList.add('error');
+    ok = false;
+  }
+  if (!state) {
+    document.getElementById('errCadState').classList.add('show');
+    document.getElementById('cadState').classList.add('error');
+    ok = false;
+  }
+  if (!termos) {
+    document.getElementById('errCadTermos').classList.add('show');
+    ok = false;
+  }
+  if (!ok) return;
+
+  setLoading('cadastro', true);
+  try {
+    const res = await fetch('/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, birthDate, gender: genderEl.value, city, state })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
+
+    localStorage.setItem('pace_token', data.token);
+    localStorage.setItem('pace_user', JSON.stringify(data.user || {}));
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user || {}));
+    localStorage.setItem('pace_ob_done', '1');
+
+    mostrarSucesso(data.user, true);
+  } catch (e) {
+    document.getElementById('errCadEmail').textContent = e.message;
+    document.getElementById('errCadEmail').classList.add('show');
+    document.getElementById('cadEmail').classList.add('error');
+  } finally {
+    setLoading('cadastro', false);
+  }
+}
+
+// ═══════════════════════════════
+// LOADING
+// ═══════════════════════════════
+function setLoading(form, on) {
+  if (form === 'login') {
+    document.getElementById('loginTxt').style.display = on ? 'none' : '';
+    document.getElementById('loginSpinner').style.display = on ? 'block' : 'none';
+    document.getElementById('btnLogin').disabled = on;
+  } else {
+    document.getElementById('cadTxt').style.display = on ? 'none' : '';
+    document.getElementById('cadSpinner').style.display = on ? 'block' : 'none';
+    document.getElementById('btnCadastro').disabled = on;
+  }
+}
+
+// ═══════════════════════════════
+// SUCESSO
+// ═══════════════════════════════
+function mostrarSucesso(user, isNovo) {
+  document.getElementById('screen-auth').classList.add('hidden');
+  document.getElementById('screen-sucesso').classList.remove('hidden');
+
+  const nome = user?.name || 'Corredor';
+  const primeiroNome = nome.split(' ')[0];
+  document.getElementById('sucIco').textContent = isNovo ? '🎉' : '🏃';
+  document.getElementById('sucXp').style.display = isNovo ? '' : 'none';
+  document.getElementById('sucSub').textContent = isNovo
+    ? 'Olá, ' + primeiroNome + '! Você ganhou +50 XP. Sua jornada começa agora!'
+    : 'Bem-vindo de volta, ' + primeiroNome + '! Continue sua evolução.';
+
+  if (isNovo) dispararConfete();
+  setTimeout(() => irParaDashboard(), 3500);
+}
+
+function irParaDashboard() {
+  const user = JSON.parse(localStorage.getItem('pace_user') || '{}');
+  const params = new URLSearchParams(window.location.search);
+  const plan = params.get('plan');
+  const redirect = sessionStorage.getItem('pace_redirect');
+
+  if (redirect) {
+    sessionStorage.removeItem('pace_redirect');
+    window.location.href = redirect;
+    return;
+  }
+
+  if (plan === 'premium') {
+    window.location.href = '/atleta.html?plan=premium';
+    return;
+  }
+  if (plan === 'longevidade') {
+    window.location.href = '/atleta.html?plan=longevidade';
+    return;
+  }
+
+  if (user.tipo === 'treinador' || user.role === 'treinador') {
+    window.location.href = '/treinador.html';
+  } else {
+    window.location.href = '/atleta.html';
+  }
+}
+
+// ═══════════════════════════════
+// CONFETE
+// ═══════════════════════════════
+function dispararConfete() {
+  const el = document.getElementById('confete');
+  const cores = ['#CCFF00', '#fff', '#2980B9', '#E74C3C', '#8E44AD'];
+  for (let i = 0; i < 50; i++) {
+    const p = document.createElement('div');
+    p.className = 'c-p';
+    Object.assign(p.style, {
+      left: Math.random() * 100 + '%',
+      top: '-10px',
+      background: cores[Math.floor(Math.random() * cores.length)],
+      animationDuration: (1.5 + Math.random() * 2) + 's',
+      animationDelay: (Math.random() * .5) + 's',
+      width: (5 + Math.random() * 7) + 'px',
+      height: (5 + Math.random() * 7) + 'px',
+      borderRadius: Math.random() > .5 ? '50%' : '2px'
+    });
+    el.appendChild(p);
+  }
+  setTimeout(() => el.innerHTML = '', 4000);
+}
+
+// ═══════════════════════════════
+// TOAST
+// ═══════════════════════════════
+function toast(msg, dur) {
+  dur = dur || 2800;
+  const el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(function() { el.classList.remove('show'); }, dur);
+}
+
+// Enter key
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  const modal = document.getElementById('modalRecuperar');
+  if (modal.style.display === 'flex') { enviarRecuperacao(); return; }
+  var panel = document.getElementById('panelLogin');
+  if (panel.classList.contains('on')) fazerLogin();
+  else fazerCadastro();
+});
+
+// ═══════════════════════════════
+// RECUPERAR SENHA
+// ═══════════════════════════════
+function abrirRecuperarSenha() {
+  const emailLogin = document.getElementById('loginEmail')?.value || '';
+  if (emailLogin) document.getElementById('recEmail').value = emailLogin;
+  document.getElementById('recBip39').value = '';
+  document.getElementById('recSenhaNova').value = '';
+  document.getElementById('recErro').style.display = 'none';
+  document.getElementById('rec-step1').style.display = 'block';
+  document.getElementById('rec-step2').style.display = 'none';
+  const modal = document.getElementById('modalRecuperar');
+  modal.style.display = 'flex';
+}
+
+function fecharRecuperarSenha() {
+  document.getElementById('modalRecuperar').style.display = 'none';
+}
+
+async function enviarRecuperacao() {
+  const email = document.getElementById('recEmail').value.trim().toLowerCase();
+  const bip39 = document.getElementById('recBip39').value.trim().toLowerCase();
+  const novaSenha = document.getElementById('recSenhaNova').value;
+  const erroEl = document.getElementById('recErro');
+  const btn = document.getElementById('recBtn');
+  erroEl.style.display = 'none';
+  if (!email || !bip39 || !novaSenha) { erroEl.textContent = 'Preencha todos os campos.'; erroEl.style.display = 'block'; return; }
+  const words = bip39.split(/\s+/).filter(Boolean);
+  if (words.length !== 12) { erroEl.textContent = 'Digite exatamente 12 palavras de recuperação.'; erroEl.style.display = 'block'; return; }
+  if (novaSenha.length < 8) { erroEl.textContent = 'A nova senha deve ter ao menos 8 caracteres.'; erroEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Verificando...';
+  try {
+    const res = await fetch('/auth/recover', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, bip39Words: bip39, novaSenha }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro ao recuperar senha');
+    document.getElementById('rec-step1').style.display = 'none';
+    document.getElementById('rec-step2').style.display = 'block';
+  } catch (e) {
+    erroEl.textContent = e.message;
+    erroEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Redefinir Senha';
+  }
+}
+
+// Nav active
+(function(){
+  var p = location.pathname;
+  document.querySelectorAll('.rg-nav-item').forEach(function(a){
+    if(p === a.getAttribute('href')) a.classList.add('active');
+  });
+})();
+</script>
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+</body>
+</html>

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>REGENI — Resultados</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#CCFF00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+:root{
+  --c:#CCFF00;
+  --c2:rgba(204,255,0,0.12);
+  --c3:rgba(204,255,0,0.06);
+  --bg:#0a0a0a;
+  --s1:#111111;
+  --s2:#171717;
+  --s3:#222222;
+  --s4:#2e2e2e;
+  --t1:#ffffff;
+  --t2:#999999;
+  --t3:#555555;
+  --b1:rgba(204,255,0,0.18);
+  --b2:rgba(255,255,255,0.07);
+  --b3:rgba(255,255,255,0.03);
+  --green:#34d399;
+  --amber:#fbbf24;
+  --red:#ff4757;
+  --pink:#e879f9;
+  --fn:'DM Sans',system-ui,sans-serif;
+  --fb:'DM Sans',system-ui,sans-serif;
+  --fm:'DM Sans',system-ui,sans-serif;
+  --st:env(safe-area-inset-top);
+  --sb:env(safe-area-inset-bottom);
+  --nh:64px;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fb);overflow-x:hidden;font-size:15px;-webkit-font-smoothing:antialiased}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b1);border-radius:4px}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:90;
+  height:calc(52px + var(--st));
+  padding-top:var(--st);
+  display:flex;align-items:center;gap:10px;
+  padding-left:16px;padding-right:16px;
+  background:rgba(10,10,10,0.94);
+  backdrop-filter:blur(24px) saturate(1.4);
+  border-bottom:1px solid var(--b2);
+}
+.topbar-logo{font-family:var(--fm);font-size:18px;font-weight:800;color:var(--c);letter-spacing:2px}
+.rg-badge-premium{display:inline-flex;align-items:center;background:var(--c);color:#000;font-size:8px;font-weight:800;letter-spacing:.3px;padding:1px 5px;border-radius:20px;vertical-align:middle;margin-left:4px;white-space:nowrap}
+.topbar-title{font-family:var(--fn);font-size:15px;font-weight:600;color:var(--t2);flex:1}
+.topbar-badge{
+  background:var(--c2);border:1px solid var(--b1);
+  border-radius:20px;padding:3px 10px;
+  font-family:var(--fm);font-size:11px;font-weight:700;color:var(--c);
+}
+
+/* ── MAIN ── */
+.main{
+  padding-top:calc(52px + var(--st) + 14px);
+  padding-bottom:calc(64px + var(--sb) + 20px);
+  padding-left:14px;padding-right:14px;
+}
+
+/* ── STAT CARDS ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.sc{
+  background:var(--s1);border:1px solid var(--b2);border-radius:14px;
+  padding:12px 10px;text-align:center;position:relative;overflow:hidden;
+}
+.sc::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--c),transparent);
+  opacity:0;transition:opacity 0.4s;
+}
+.sc.loaded::after{opacity:1}
+.sc-val{font-family:var(--fm);font-size:18px;font-weight:700;color:var(--c);line-height:1}
+.sc-val.green{color:var(--green)}
+.sc-val.amber{color:var(--amber)}
+.sc-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.8px;margin-top:4px;font-weight:600}
+
+/* ── SEARCH ── */
+.search-block{position:relative;margin-bottom:12px}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none;display:flex}
+.search-input{
+  width:100%;background:var(--s1);border:1px solid var(--b2);border-radius:14px;
+  padding:13px 110px 13px 42px;font-size:14px;color:var(--t1);font-family:var(--fb);
+  outline:none;transition:border-color 0.2s,background 0.2s;
+}
+.search-input::placeholder{color:var(--t3)}
+.search-input:focus{border-color:var(--c);background:var(--s2)}
+.search-btn{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  background:var(--c);color:#000;border:none;border-radius:10px;
+  padding:8px 16px;font-size:13px;font-weight:700;font-family:var(--fn);
+  cursor:pointer;transition:opacity 0.2s,transform 0.15s;
+  display:flex;align-items:center;gap:5px;
+}
+.search-btn:active{transform:translateY(-50%) scale(0.96)}
+.search-btn.loading{opacity:0.6;pointer-events:none}
+
+/* SEARCH DROPDOWN */
+.search-dropdown{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:80;
+  background:var(--s2);border:1px solid var(--b1);border-radius:14px;
+  overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,0.6);
+  display:none;
+  max-height:260px;overflow-y:auto;
+}
+.search-dropdown.open{display:block}
+.sd-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;border-bottom:1px solid var(--b2);cursor:pointer;
+  transition:background 0.15s;text-decoration:none;color:inherit;
+}
+.sd-item:last-child{border-bottom:none}
+.sd-item:hover,.sd-item:active{background:var(--c3)}
+.sd-name{font-size:14px;font-weight:500}
+.sd-meta{font-size:11px;color:var(--t3);margin-top:2px}
+.sd-nivel{font-size:11px;color:var(--c);font-family:var(--fm)}
+.sd-arrow{color:var(--t3);font-size:14px}
+.sd-empty{padding:20px;text-align:center;color:var(--t3);font-size:13px}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:6px;margin-bottom:14px;background:var(--s1);border-radius:14px;padding:4px}
+.tab{
+  flex:1;padding:9px 6px;border-radius:10px;font-size:12px;font-weight:700;
+  font-family:var(--fn);cursor:pointer;border:none;background:transparent;
+  color:var(--t3);transition:all 0.2s;text-align:center;
+}
+.tab.active{background:var(--s3);color:var(--c);box-shadow:0 2px 8px rgba(0,0,0,0.35)}
+
+/* ── FILTER PANEL ── */
+.filter-panel{background:var(--s1);border:1px solid var(--b2);border-radius:16px;padding:14px;margin-bottom:12px}
+.filter-row{display:grid;gap:8px;margin-bottom:8px}
+.filter-row.cols3{grid-template-columns:repeat(3,1fr)}
+.filter-row.cols2{grid-template-columns:repeat(2,1fr)}
+.filter-row.cols1{grid-template-columns:1fr}
+
+.fsel{
+  background:var(--s3);border:1px solid var(--b2);border-radius:10px;
+  padding:9px 10px;font-size:12px;color:var(--t1);font-family:var(--fb);
+  outline:none;width:100%;cursor:pointer;
+  transition:border-color 0.2s;
+}
+.fsel:focus{border-color:var(--c)}
+.fsel option{background:var(--s2)}
+
+.go-btn{
+  width:100%;padding:12px;border-radius:12px;border:none;
+  background:var(--c);
+  color:#000;font-size:14px;font-weight:800;font-family:var(--fn);
+  cursor:pointer;transition:opacity 0.2s,transform 0.15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.go-btn:active{transform:scale(0.98)}
+.go-btn.loading{opacity:0.6;pointer-events:none}
+.go-btn.loading::after{
+  content:'';width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);
+  border-top-color:#000;border-radius:50%;
+  animation:spin 0.7s linear infinite;display:inline-block;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── MINI STATS ── */
+.mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.ms{background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:10px 6px;text-align:center}
+.ms-val{font-family:var(--fm);font-size:13px;font-weight:700;line-height:1}
+.ms-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;margin-top:3px}
+
+/* ── RESULTS HEADER ── */
+.res-header{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--s2);border:1px solid var(--b2);
+  border-radius:14px 14px 0 0;padding:12px 14px;
+  border-bottom:1px solid var(--b2);
+}
+.res-title{font-family:var(--fn);font-size:14px;font-weight:700}
+.res-count{font-family:var(--fm);font-size:12px;color:var(--c)}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--s2);border:1px solid var(--b2);border-top:none;border-radius:0 0 14px 14px;overflow:hidden}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl thead tr{border-bottom:1px solid var(--b2)}
+.tbl th{
+  padding:9px 8px;text-align:left;color:var(--t3);
+  font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;
+  white-space:nowrap;
+}
+.tbl th:last-child,.tbl td:last-child{text-align:right}
+.tbl td{padding:10px 8px;border-bottom:1px solid var(--b3);vertical-align:middle}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl tbody tr{transition:background 0.1s;cursor:pointer}
+.tbl tbody tr:hover{background:var(--c3)}
+.tbl tbody tr.top3{background:rgba(204,255,0,0.03)}
+
+/* POS */
+.pos{font-family:var(--fm);font-weight:700;font-size:13px;color:var(--t3);white-space:nowrap}
+.pos.p1{font-size:16px}
+.pos.p2{font-size:15px}
+.pos.p3{font-size:14px}
+
+/* ATHLETE NAME */
+.aname{font-weight:500;font-size:13px;line-height:1.3}
+.astate{font-size:10px;color:var(--t3);margin-top:1px}
+.aequipe{font-size:10px;color:var(--c);opacity:0.7;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
+
+/* GENDER TAG */
+.gtag{font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px}
+.gtag.M{color:#60A5FA;background:rgba(96,165,250,0.1)}
+.gtag.F{color:#F472B6;background:rgba(244,114,182,0.1)}
+
+/* TIME */
+.ttime{font-family:var(--fm);font-weight:700;font-size:13px;white-space:nowrap}
+.ttime.elite{color:var(--amber)}
+.ttime.fast{color:var(--green)}
+.ttime.good{color:var(--c)}
+.ttime.normal{color:var(--t2)}
+
+/* PACE */
+.pace{font-family:var(--fm);font-size:10px;color:var(--t3);white-space:nowrap}
+
+/* NIVEL */
+.nivel{font-size:9px;white-space:nowrap}
+
+/* MORE BTN */
+.more-btn{
+  width:100%;padding:13px;border:1px solid var(--b1);border-top:none;
+  background:var(--s1);color:var(--c);font-size:13px;font-weight:700;
+  font-family:var(--fn);cursor:pointer;border-radius:0 0 14px 14px;
+  transition:background 0.2s;
+}
+.more-btn:hover{background:var(--c3)}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;background:var(--s2);border:1px solid var(--b2);border-radius:0 0 14px 14px}
+.empty-icon{font-size:40px;opacity:0.25;margin-bottom:12px}
+.empty-txt{color:var(--t3);font-size:14px}
+
+/* LOADING SKELETON */
+.skel-row{
+  display:flex;gap:10px;align-items:center;padding:12px 14px;
+  border-bottom:1px solid var(--b3);
+}
+.skel{
+  border-radius:6px;background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);
+  background-size:200% 100%;animation:shimmer 1.4s infinite;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* EQUIPES */
+.equipe-card{
+  background:var(--s2);border:1px solid var(--b2);border-radius:14px;
+  margin-bottom:8px;overflow:hidden;
+}
+.eq-header{display:flex;align-items:center;gap:12px;padding:14px}
+.eq-pos{font-family:var(--fm);font-size:16px;font-weight:700;width:28px;flex-shrink:0;text-align:center}
+.eq-name{font-family:var(--fn);font-size:14px;font-weight:700;flex:1}
+.eq-count{font-size:12px;color:var(--t3);text-align:right}
+.eq-best{font-family:var(--fm);font-size:12px;color:var(--green)}
+.eq-bar{height:3px;background:var(--s3)}
+.eq-fill{height:100%;background:linear-gradient(90deg,var(--c),var(--green));transition:width 0.6s ease}
+
+/* ── NAV UNIFICADA ── */
+.rg-bottom-nav{position:fixed;bottom:0;left:0;right:0;height:64px;background:rgba(10,10,10,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--s3);display:flex;align-items:center;justify-content:space-around;padding-bottom:var(--sb);z-index:1000}
+.rg-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#444;font-size:0.625rem;font-weight:700;font-family:var(--fn);letter-spacing:.3px;transition:color .2s;padding:4px 0}
+.rg-nav-item span:first-child{font-size:22px;line-height:1}
+.rg-nav-item.active,.rg-nav-item:hover{color:var(--c)}
+
+/* ── ATHLETE SHEET ── */
+.overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);
+  display:flex;align-items:flex-end;
+  opacity:0;pointer-events:none;transition:opacity 0.28s;
+}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{
+  width:100%;background:var(--s1);border-radius:22px 22px 0 0;
+  padding-bottom:calc(24px + var(--sb));
+  transform:translateY(100%);transition:transform 0.38s cubic-bezier(0.32,0.72,0,1);
+  max-height:82vh;overflow-y:auto;
+}
+.overlay.open .sheet{transform:translateY(0)}
+.sheet-drag{width:36px;height:4px;background:var(--s4);border-radius:2px;margin:12px auto 18px}
+.sheet-body{padding:0 18px}
+.sh-name{font-family:var(--fn);font-size:20px;font-weight:800;margin-bottom:2px}
+.sh-meta{font-size:13px;color:var(--t3);margin-bottom:18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sh-tag{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600}
+.sh-tag.M{background:rgba(96,165,250,0.12);color:#60A5FA}
+.sh-tag.F{background:rgba(244,114,182,0.12);color:#F472B6}
+.sh-tag.nivel{background:var(--c2);color:var(--c)}
+.sh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.sh-stat{background:var(--s2);border-radius:12px;padding:12px;border:1px solid var(--b2)}
+.sh-sv{font-family:var(--fm);font-size:18px;font-weight:700;color:var(--c)}
+.sh-sl{font-size:11px;color:var(--t3);margin-top:3px;text-transform:uppercase;letter-spacing:0.5px}
+.sh-section{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px}
+.sh-race{
+  background:var(--s2);border:1px solid var(--b2);border-radius:12px;
+  padding:12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;
+}
+.sh-race-pos{
+  width:28px;height:28px;border-radius:8px;background:var(--s3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;
+}
+.sh-race-info{flex:1;min-width:0}
+.sh-race-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sh-race-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.sh-race-time{font-family:var(--fm);font-size:14px;font-weight:700;color:var(--green);flex-shrink:0}
+.sh-close{
+  width:100%;padding:13px;border-radius:12px;border:1px solid var(--b2);
+  background:var(--s3);color:var(--t2);font-size:14px;font-weight:600;
+  font-family:var(--fn);cursor:pointer;margin-top:6px;
+}
+.sh-profile-btn{
+  width:100%;padding:13px;border-radius:12px;border:none;
+  background:var(--c);color:#000;font-size:14px;font-weight:800;
+  font-family:var(--fn);cursor:pointer;margin-bottom:8px;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:calc(var(--nh) + var(--sb) + 14px);left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--s2);border:1px solid var(--b1);border-radius:12px;
+  padding:10px 18px;font-size:13px;font-weight:500;color:var(--t1);
+  white-space:nowrap;z-index:300;opacity:0;transition:opacity 0.25s,transform 0.25s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ANIMATE IN */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp 0.3s ease both}
+
+/* hidden utility */
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <span class="topbar-logo">REGENI</span>
+  <span class="topbar-title">Resultados</span>
+  <span class="topbar-badge" id="topBadge">—</span>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STAT CARDS -->
+  <div class="stats">
+    <div class="sc" id="scCorridas">
+      <div class="sc-val" id="vCorridas">—</div>
+      <div class="sc-lbl">Corridas</div>
+    </div>
+    <div class="sc" id="scResultados">
+      <div class="sc-val green" id="vResultados">—</div>
+      <div class="sc-lbl">Resultados</div>
+    </div>
+    <div class="sc" id="scAtletas">
+      <div class="sc-val amber" id="vAtletas">—</div>
+      <div class="sc-lbl">Atletas</div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-block" id="searchBlock">
+    <div class="search-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </div>
+    <input class="search-input" id="searchInput" type="text"
+      placeholder="Buscar atleta por nome..."
+      autocomplete="off" autocorrect="off" spellcheck="false"
+      oninput="onSearchInput(this.value)"
+      onkeydown="if(event.key==='Enter'){buscarAtleta();this.blur()}">
+    <button class="search-btn" id="searchBtn" onclick="buscarAtleta()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Buscar
+    </button>
+    <div class="search-dropdown" id="searchDrop"></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" id="t0" onclick="showTab(0)">🏅 Ranking</button>
+    <button class="tab" id="t1" onclick="showTab(1)">📋 Por Prova</button>
+  </div>
+
+  <!-- TAB 0: RANKING -->
+  <div id="tab0">
+    <div class="filter-panel">
+      <div class="filter-row cols3">
+        <select class="fsel" id="rdist">
+          <option value="3">3 km</option>
+          <option value="5">5 km</option>
+          <option value="10" selected>10 km</option>
+          <option value="15">15 km</option>
+          <option value="21">Meia</option>
+          <option value="42">Maratona</option>
+        </select>
+        <select class="fsel" id="rgen">
+          <option value="">Geral</option>
+          <option value="M">♂ Masc</option>
+          <option value="F">♀ Fem</option>
+        </select>
+        <select class="fsel" id="rfaixa">
+          <option value="">Todas idades</option>
+          <option value="16-19">16–19</option>
+          <option value="20-24">20–24</option>
+          <option value="25-29">25–29</option>
+          <option value="30-34">30–34</option>
+          <option value="35-39">35–39</option>
+          <option value="40-44">40–44</option>
+          <option value="45-49">45–49</option>
+          <option value="50-54">50–54</option>
+          <option value="55-59">55–59</option>
+          <option value="60-69">60–69</option>
+          <option value="70">70+</option>
+        </select>
+      </div>
+      <div class="filter-row cols2">
+        <select class="fsel" id="rstate" onchange="updateCidades()">
+          <option value="">Todos os estados</option>
+        </select>
+        <select class="fsel" id="rcidade">
+          <option value="">Todas as cidades</option>
+        </select>
+      </div>
+      <button class="go-btn" id="rankBtn" onclick="buscarRanking()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Buscar Ranking
+      </button>
+    </div>
+    <div id="rankRes"></div>
+  </div>
+
+  <!-- TAB 1: POR PROVA -->
+  <div id="tab1" class="hidden">
+    <div class="filter-panel">
+      <div class="search-block" style="margin-bottom:8px">
+        <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <input type="text" class="search-input" id="rprovaBusca" placeholder="Buscar corrida por nome..." oninput="filtrarProvas()" style="padding-right:14px" autocomplete="off">
+      </div>
+      <div class="filter-row cols2" id="rpFiltros" style="display:none;margin-bottom:8px">
+        <select class="fsel" id="rpgen">
+          <option value="">Geral</option>
+          <option value="M">♂ Masc</option>
+          <option value="F">♀ Fem</option>
+        </select>
+        <select class="fsel" id="rpdist">
+          <option value="">Todas as distâncias</option>
+        </select>
+      </div>
+      <button class="go-btn" id="provaBtn" onclick="buscarPorProva()" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Ver Resultados
+      </button>
+    </div>
+    <div id="provaCards"></div>
+    <div id="provaRes"></div>
+  </div>
+
+  <!-- TAB 2: EQUIPES -->
+
+</div>
+
+<!-- NAV UNIFICADA -->
+<nav class="rg-bottom-nav">
+  <a href="/" class="rg-nav-item" id="nav-home"><span>🏠</span><span>Início</span></a>
+  <a href="/resultados.html" class="rg-nav-item" id="nav-resultados"><span>🔍</span><span>Resultados</span></a>
+  <a href="/atleta.html" class="rg-nav-item" id="nav-atleta"><span>👤</span><span>Atleta</span></a>
+  <a href="/corridas-abertas.html" class="rg-nav-item" id="nav-corridas"><span>🏁</span><span>Corridas</span></a>
+</nav>
+<script>(function(){var m={'/' :'nav-home','/resultados.html':'nav-resultados','/atleta.html':'nav-atleta','/corridas-abertas.html':'nav-corridas'};var el=document.getElementById(m[location.pathname]);if(el)el.classList.add('active');})();</script>
+
+<!-- ATHLETE DETAIL SHEET -->
+<div class="overlay" id="overlay" onclick="closeSheet(event)">
+  <div class="sheet">
+    <div class="sheet-drag"></div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// CONSTANTES E ESTADO
+// ══════════════════════════════════════
+const UFs = 'AC,AL,AP,AM,BA,CE,DF,ES,GO,MA,MT,MS,MG,PA,PB,PR,PE,PI,RJ,RN,RS,RO,RR,SC,SP,SE,TO'.split(',');
+const UFn = {AC:'Acre',AL:'Alagoas',AP:'Amapá',AM:'Amazonas',BA:'Bahia',CE:'Ceará',DF:'Distrito Federal',ES:'Espírito Santo',GO:'Goiás',MA:'Maranhão',MT:'Mato Grosso',MS:'Mato Grosso do Sul',MG:'Minas Gerais',PA:'Pará',PB:'Paraíba',PR:'Paraná',PE:'Pernambuco',PI:'Piauí',RJ:'Rio de Janeiro',RN:'Rio Grande do Norte',RS:'Rio Grande do Sul',RO:'Rondônia',RR:'Roraima',SC:'Santa Catarina',SP:'São Paulo',SE:'Sergipe',TO:'Tocantins'};
+const MED = ['🥇','🥈','🥉'];
+const DIST_MAP = {'3':'3K','5':'5K','10':'10K','15':'15K','21':'21K','42':'42K'};
+
+let allData = [];       // dados do ranking atual
+let currentTab = 0;
+let provasList = [];    // lista de provas
+let selectedRaceId = null; // prova selecionada na aba "Por Prova"
+let shownRows = 50;     // paginação
+let searchTimer = null;
+
+// ══════════════════════════════════════
+// UTILITÁRIOS
+// ══════════════════════════════════════
+function tempoSec(t){
+  if(!t||t==='DNS') return 999999;
+  const p=t.split(':').map(Number);
+  if(p.length===3) return p[0]*3600+p[1]*60+p[2];
+  if(p.length===2) return p[0]*60+p[1];
+  return 999999;
+}
+
+// Remove "00:" prefix from sub-1-hour times (00:23:33 → 23:33)
+function formatTime(t){
+  if(!t||t==='—') return t;
+  return t.replace(/^00:/,'');
+}
+
+// Extract km from distance string ("10K" → 10, "21.1km" → 21.1)
+function extrairKm(distStr){
+  if(!distStr) return null;
+  const m=distStr.match(/(\d+(?:\.\d+)?)/);
+  return m?parseFloat(m[1]):null;
+}
+
+function calcPace(t, km){
+  const s=tempoSec(t);
+  if(s===999999||!km) return '—';
+  const ps=s/km;
+  return Math.floor(ps/60)+':'+String(Math.round(ps%60)).padStart(2,'0')+'/km';
+}
+
+function calcVel(t, km){
+  const s=tempoSec(t);
+  if(s===999999||!km) return '—';
+  return (km/(s/3600)).toFixed(1)+' km/h';
+}
+
+function timeClass(t, km){
+  const s=tempoSec(t);
+  if(s===999999) return 'normal';
+  const pm=(s/km)/60;
+  if(pm<4.0) return 'elite';
+  if(pm<5.0) return 'fast';
+  if(pm<6.5) return 'good';
+  return 'normal';
+}
+
+function fmtNum(n){
+  if(n>=1000000) return (n/1000000).toFixed(1)+'M';
+  if(n>=10000) return (n/1000).toFixed(1)+'k';
+  return n.toLocaleString('pt-BR');
+}
+
+function animNum(id, target){
+  const el=document.getElementById(id);
+  if(!el) return;
+  let cur=0;
+  const dur=600, fps=30, steps=dur/fps;
+  const step=target/steps;
+  const t=setInterval(()=>{
+    cur=Math.min(cur+step, target);
+    el.textContent=fmtNum(Math.round(cur));
+    if(cur>=target){ el.textContent=fmtNum(target); clearInterval(t); }
+  }, fps);
+}
+
+function showToast(msg, dur=2500){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), dur);
+}
+
+function setLoading(btnId, on){
+  const b=document.getElementById(btnId);
+  if(!b) return;
+  b.classList.toggle('loading', on);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+async function init(){
+  // Estados no select
+  const sel=document.getElementById('rstate');
+  UFs.forEach(uf=>{
+    const o=document.createElement('option');
+    o.value=uf; o.textContent=UFn[uf];
+    sel.appendChild(o);
+  });
+
+  // Click fora fecha dropdown
+  document.addEventListener('click', e=>{
+    if(!document.getElementById('searchBlock').contains(e.target)){
+      document.getElementById('searchDrop').classList.remove('open');
+    }
+  });
+
+  // Analytics overview — rota correta: /analytics/overview
+  try{
+    const d = await fetch('/analytics/overview').then(r=>r.json());
+    animNum('vCorridas', d.totalRaces||0);
+    animNum('vResultados', d.totalResults||0);
+    animNum('vAtletas', d.totalAthletes||0);
+    document.getElementById('topBadge').textContent = fmtNum(d.totalResults||0);
+    ['scCorridas','scResultados','scAtletas'].forEach(id=>{
+      setTimeout(()=>document.getElementById(id)?.classList.add('loaded'), 800);
+    });
+  }catch(e){ console.warn('Analytics offline:', e.message); }
+
+  // Carregar provas — rota correta: /provas
+  try{
+    const raw = await fetch('/provas').then(r=>r.json());
+    provasList = raw.filter(p=>p.name&&p.name.trim());
+    renderProvaCards(provasList.slice(0,20));
+  }catch(e){ console.warn('Provas offline:', e.message); }
+
+  // Busca inicial do ranking
+  buscarRanking();
+}
+
+// ══════════════════════════════════════
+// TABS
+// ══════════════════════════════════════
+function showTab(n){
+  currentTab=n;
+  for(let i=0;i<2;i++){
+    document.getElementById('tab'+i).classList.toggle('hidden', i!==n);
+    document.getElementById('t'+i).classList.toggle('active', i===n);
+  }
+}
+
+// ══════════════════════════════════════
+// CIDADES — carrega do backend ao trocar estado
+// ══════════════════════════════════════
+async function updateCidades(){
+  const state=document.getElementById('rstate').value;
+  const sel=document.getElementById('rcidade');
+  sel.innerHTML='<option value="">Todas as cidades</option>';
+  if(!state) return;
+  try{
+    const cities=await fetch('/api/meta/cidades?estado='+encodeURIComponent(state)).then(r=>r.json());
+    if(!Array.isArray(cities)) return;
+    cities.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c; o.textContent=c;
+      sel.appendChild(o);
+    });
+  }catch(e){ console.warn('Cidades offline:', e.message); }
+}
+
+// ══════════════════════════════════════
+// DISTÂNCIAS DA PROVA (carregadas do backend)
+// ══════════════════════════════════════
+async function loadDistancias(raceId){
+  const sel=document.getElementById('rpdist');
+  sel.innerHTML='<option value="">Todas as distâncias</option>';
+  if(!raceId) return;
+
+  try{
+    // Rota correta: /corrida/:raceId/distancias
+    const dists=await fetch(`/corrida/${raceId}/distancias`).then(r=>r.json());
+    dists.forEach(d=>{
+      const o=document.createElement('option');
+      o.value=d.distance;
+      o.textContent=`${d.distance} · ${d.total} atletas`;
+      sel.appendChild(o);
+    });
+  }catch(e){
+    // fallback: usar prova da lista
+    const prova=provasList.find(p=>p.id===raceId);
+    const dists=prova?.distances||[];
+    dists.forEach(d=>{
+      const o=document.createElement('option');
+      o.value=d; o.textContent=d;
+      sel.appendChild(o);
+    });
+  }
+}
+
+// ══════════════════════════════════════
+// RANKING — rota correta: /ranking/:dist + /ranking/stats
+// ══════════════════════════════════════
+async function buscarRanking(){
+  const dist=document.getElementById('rdist').value;
+  const gen=document.getElementById('rgen').value;
+  const state=document.getElementById('rstate').value;
+  const cidade=document.getElementById('rcidade').value;
+  const faixa=document.getElementById('rfaixa').value;
+  const km=parseFloat(dist==='21'?'21.1':dist==='42'?'42.2':dist);
+
+  const el=document.getElementById('rankRes');
+  el.innerHTML=skeletonRows(6);
+  setLoading('rankBtn', true);
+  shownRows=50;
+
+  try{
+    // Rota correta: /ranking/:dist + km
+    let url=`/ranking/${dist}km`;
+    if(gen) url+=`?genero=${gen}`;
+
+    const d=await fetch(url).then(r=>{
+      if(!r.ok) throw new Error('Erro '+r.status);
+      return r.json();
+    });
+    allData=d;
+
+    // Filtros client-side
+    let filtered=d;
+    if(state) filtered=filtered.filter(r=>r.state===state);
+    if(cidade) filtered=filtered.filter(r=>r.city===cidade);
+
+    // Filtro de faixa etária — campo faixaEtaria pode ser null, proteger
+    if(faixa) filtered=filtered.filter(r=>
+      r.faixaEtaria && String(r.faixaEtaria).includes(faixa)
+    );
+
+    // Re-numerar posições após filtro
+    filtered=filtered.map((r,i)=>({...r, posicao:i+1}));
+
+    // Atualiza cidades com dados carregados
+    updateCidades();
+
+    const distLabel={'3':'3km','5':'5km','10':'10km','15':'15km','21':'Meia Maratona','42':'Maratona'}[dist]||dist+'km';
+    const genLabel=gen?` · ${gen==='M'?'Masculino':'Feminino'}`:'';
+    const stLabel=state?` · ${UFn[state]}`:'';
+    const titulo=`🇧🇷 Ranking ${distLabel}${genLabel}${stLabel}`;
+
+    el.innerHTML=miniStats(filtered,km)+renderHeader(titulo, filtered.length)+renderTable(filtered,km,true,shownRows)+(filtered.length>shownRows?moreBtn():'');
+    document.getElementById('topBadge').textContent=fmtNum(filtered.length)+' atletas';
+
+    // Bind more btn
+    bindMoreBtn(()=>{
+      shownRows+=50;
+      el.innerHTML=miniStats(filtered,km)+renderHeader(titulo,filtered.length)+renderTable(filtered,km,true,shownRows)+(filtered.length>shownRows?moreBtn():'');
+      bindMoreBtn(arguments.callee);
+      bindRows(filtered,km);
+    });
+    bindRows(filtered,km);
+
+  }catch(e){
+    el.innerHTML=`<div class="empty" style="border-radius:0 0 14px 14px"><div class="empty-icon">⚠️</div><div class="empty-txt">${e.message}</div></div>`;
+  }finally{
+    setLoading('rankBtn', false);
+  }
+}
+
+// ══════════════════════════════════════
+// POR PROVA — busca + cards + resultados
+// ══════════════════════════════════════
+function filtrarProvas(){
+  const q=document.getElementById('rprovaBusca').value.trim().toLowerCase();
+  if(!q){
+    // Se limpou o campo, volta a mostrar lista + esconde filtros/botão
+    selectedRaceId=null;
+    document.getElementById('rpFiltros').style.display='none';
+    document.getElementById('provaBtn').style.display='none';
+    document.getElementById('provaRes').innerHTML='';
+    renderProvaCards(provasList.slice(0,20));
+    return;
+  }
+  const lista=provasList.filter(p=>p.name.toLowerCase().includes(q)).slice(0,30);
+  renderProvaCards(lista);
+}
+
+function renderProvaCards(lista){
+  const el=document.getElementById('provaCards');
+  if(!lista||!lista.length){
+    el.innerHTML='<div class="empty" style="border-radius:14px"><div class="empty-icon">🔍</div><div class="empty-txt" style="font-size:13px;color:var(--t2)">Nenhuma corrida encontrada</div></div>';
+    return;
+  }
+  el.innerHTML=lista.map(p=>{
+    const d=new Date(p.date);
+    const mes=d.toLocaleDateString('pt-BR',{month:'short',year:'numeric'});
+    const safeName=p.name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+    const safeNameAttr=p.name.replace(/"/g,'&quot;');
+    return `<div class="sd-item" style="background:var(--s1);border:1px solid var(--b2);border-radius:10px;margin-bottom:6px" data-id="${p.id}" data-name="${safeNameAttr}" onclick="selecionarProva(this)">
+      <div>
+        <div class="sd-name">${safeName}</div>
+        <div class="sd-meta">${p.city||''} · ${mes} · ${p.totalResults||0} atletas</div>
+      </div>
+      <span class="sd-arrow" style="flex-shrink:0">›</span>
+    </div>`;
+  }).join('');
+}
+
+function selecionarProva(el){
+  selectedRaceId=el.dataset.id;
+  document.getElementById('rprovaBusca').value=el.dataset.name;
+  document.getElementById('provaCards').innerHTML='';
+  document.getElementById('rpFiltros').style.display='grid';
+  document.getElementById('provaBtn').style.display='flex';
+  loadDistancias(selectedRaceId);
+}
+
+async function buscarPorProva(){
+  const raceId=selectedRaceId;
+  if(!raceId){ showToast('Selecione uma prova'); return; }
+  const gen=document.getElementById('rpgen').value;
+  const dist=document.getElementById('rpdist').value;
+
+  const el=document.getElementById('provaRes');
+  el.innerHTML=skeletonRows(6);
+  setLoading('provaBtn', true);
+  shownRows=50;
+
+  try{
+    // Rota correta: /ranking/prova/:raceId
+    let url=`/ranking/prova/${raceId}`;
+    const params=[];
+    if(gen) params.push(`genero=${gen}`);
+    if(dist) params.push(`distance=${encodeURIComponent(dist)}`);
+    if(params.length) url+='?'+params.join('&');
+
+    const d=await fetch(url).then(r=>{
+      if(!r.ok) throw new Error('Erro '+r.status);
+      return r.json();
+    });
+
+    const prova=provasList.find(p=>p.id===raceId);
+    const titulo=`📋 ${prova?.name||'Resultados'}${prova?.city?` — ${prova.city}`:''}`;
+
+    // Extrair km da distância selecionada ou usar 10 como fallback seguro
+    const distKm=dist ? parseFloat(dist.match(/(\d+(?:\.\d+)?)/)?.[1]||'10') : 10;
+
+    el.innerHTML=miniStats(d,distKm)+renderHeader(titulo,d.length)+renderTable(d,distKm,false,shownRows)+(d.length>shownRows?moreBtn():'');
+
+    bindMoreBtn(()=>{
+      shownRows+=50;
+      el.innerHTML=miniStats(d,distKm)+renderHeader(titulo,d.length)+renderTable(d,distKm,false,shownRows)+(d.length>shownRows?moreBtn():'');
+      bindMoreBtn(arguments.callee);
+      bindRows(d,distKm);
+    });
+    bindRows(d,distKm);
+
+  }catch(e){
+    el.innerHTML=`<div class="empty" style="border-radius:0 0 14px 14px"><div class="empty-icon">⚠️</div><div class="empty-txt">${e.message}</div></div>`;
+  }finally{
+    setLoading('provaBtn', false);
+  }
+}
+
+// ══════════════════════════════════════
+// BUSCAR ATLETA — rota correta: /buscar-atletas?nome=
+// ══════════════════════════════════════
+let searchAbort=null;
+
+function onSearchInput(val){
+  clearTimeout(searchTimer);
+  if(!val||val.length<2){
+    document.getElementById('searchDrop').classList.remove('open');
+    return;
+  }
+  searchTimer=setTimeout(()=>buscarAtleta(val, true), 350);
+}
+
+async function buscarAtleta(q, dropdown=false){
+  const input=document.getElementById('searchInput');
+  q=q||input.value.trim();
+  if(!q||q.length<2){ showToast('Digite pelo menos 2 letras'); return; }
+
+  const drop=document.getElementById('searchDrop');
+
+  if(dropdown){
+    drop.innerHTML='<div class="sd-empty">⏳ Buscando...</div>';
+    drop.classList.add('open');
+  }else{
+    setLoading('searchBtn', true);
+  }
+
+  if(searchAbort) searchAbort.abort();
+  searchAbort=new AbortController();
+
+  try{
+    // Rota correta: /buscar-atletas?nome=
+    const d=await fetch(`/buscar-atletas?nome=${encodeURIComponent(q)}&limit=12`,{signal:searchAbort.signal}).then(r=>r.json());
+
+    if(!d||!d.length){
+      drop.innerHTML='<div class="sd-empty">Nenhum atleta encontrado para "<strong>'+q+'"</strong></div>';
+      drop.classList.add('open');
+      return;
+    }
+
+    drop.innerHTML=d.slice(0,12).map(a=>`
+      <a class="sd-item" href="/perfil-atleta.html?id=${a.id}">
+        <div>
+          <div class="sd-name">${a.name}${a.isPremium?'<span class="rg-badge-premium">REGENI</span>':''}</div>
+          <div class="sd-meta">${a.state||'—'} · ${a.totalRaces||0} provas</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="sd-nivel">${a.nivel||''}</div>
+          <div class="sd-arrow">→</div>
+        </div>
+      </a>`).join('');
+    drop.classList.add('open');
+
+  }catch(e){
+    if(e.name==='AbortError') return;
+    drop.innerHTML='<div class="sd-empty" style="color:var(--red)">Erro na busca</div>';
+  }finally{
+    setLoading('searchBtn', false);
+  }
+}
+
+// ══════════════════════════════════════
+// RENDER: MINI STATS
+// ══════════════════════════════════════
+function miniStats(data, km){
+  if(!data||data.length<3) return '';
+  const times=data.map(r=>{
+    const t=r.melhorTempo||r.tempo||r.time;
+    return t&&t!=='DNS'?tempoSec(t):null;
+  }).filter(Boolean);
+  if(times.length<2) return '';
+
+  const best=times[0];
+  const median=times[Math.floor(times.length/2)];
+  const fem=data.filter(r=>r.gender==='F').length;
+  const total=times.length;
+
+  const fmtT=s=>{
+    const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;
+    return h>0?`${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`:`${m}:${String(ss).padStart(2,'0')}`;
+  };
+
+  // Velocidade média (km/h) com base no tempo mediano
+  const velMedia = km ? (km / (median/3600)).toFixed(1) : null;
+
+  return `<div class="mini-stats fade-up">
+    <div class="ms"><div class="ms-val" style="color:var(--amber)">${fmtT(best)}</div><div class="ms-lbl">Melhor</div></div>
+    <div class="ms"><div class="ms-val" style="color:var(--c)">${fmtT(median)}</div><div class="ms-lbl">Mediana</div></div>
+    <div class="ms"><div class="ms-val" style="color:var(--green)">${velMedia?velMedia+'km/h':'—'}</div><div class="ms-lbl">Vel. Média</div></div>
+    <div class="ms"><div class="ms-val" style="color:var(--pink)">${total>0?Math.round(fem/total*100):0}%</div><div class="ms-lbl">Feminino</div></div>
+  </div>`;
+}
+
+// ══════════════════════════════════════
+// RENDER: HEADER + TABLE
+// ══════════════════════════════════════
+function renderHeader(titulo, count){
+  return `<div class="res-header fade-up">
+    <div class="res-title">${titulo}</div>
+    <div class="res-count">${fmtNum(count)} atletas</div>
+  </div>`;
+}
+
+function renderTable(data, km, showProva=false, limit=50){
+  if(!data||!data.length) return `<div class="empty"><div class="empty-icon">📭</div><div class="empty-txt">Sem resultados para estes filtros</div></div>`;
+
+  const rows=data.slice(0,limit).map((r,i)=>{
+    const pos=r.posicao||(i+1);
+    const medal=pos<=3?MED[pos-1]:pos;
+    const posClass=pos===1?'p1':pos===2?'p2':pos===3?'p3':'';
+    // Campo correto: melhorTempo (ranking) ou tempo (prova)
+    const tempo=r.melhorTempo||r.tempo||r.time||'—';
+    // Usar distância da linha quando disponível (evita pace errado em provas multi-distância)
+    const rowKm=extrairKm(r.distance)||km;
+    const tc=tempo!=='—'?timeClass(tempo,rowKm):'normal';
+    const g=r.gender||'';
+    // Campo correto: state (backend retorna state não estado)
+    const estado=r.state||'';
+    // equipe vem do backend como r.equipe
+    const equipe=r.equipe||'';
+    // prova: backend retorna melhorProva (não prova)
+    const provaNome=r.melhorProva||r.prova||'';
+
+    return `<tr class="${pos<=3?'top3':''}" data-idx="${i}">
+      <td><span class="pos ${posClass}">${medal}</span></td>
+      <td>
+        <div class="aname">${r.name||'—'}${r.isPremium?'<span class="rg-badge-premium">REGENI</span>':''}${estado?`<span style="color:var(--t3);font-size:10px;font-weight:400"> · ${estado}</span>`:''}</div>
+        ${equipe?`<div class="aequipe">${equipe}</div>`:''}
+        ${showProva&&provaNome?`<div class="astate">${provaNome}</div>`:''}
+      </td>
+      <td>${g?`<span class="gtag ${g}">${g}</span>`:''}</td>
+      <td class="text-right"><span class="ttime ${tc}">${formatTime(tempo)}</span></td>
+      <td class="text-right"><span class="pace">${calcPace(tempo,rowKm)}</span></td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="table-wrap fade-up"><table class="tbl">
+    <thead><tr>
+      <th style="width:36px">#</th>
+      <th>Atleta</th>
+      <th style="width:32px">G</th>
+      <th>Tempo</th>
+      <th>Pace</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function moreBtn(){
+  return `<button class="more-btn" id="moreBtn">Carregar mais →</button>`;
+}
+
+function bindMoreBtn(fn){
+  const btn=document.getElementById('moreBtn');
+  if(btn) btn.onclick=fn;
+}
+
+function bindRows(data, km){
+  document.querySelectorAll('.tbl tbody tr[data-idx]').forEach(tr=>{
+    tr.onclick=()=>{
+      const r=data[parseInt(tr.dataset.idx)];
+      if(r) openAthleteSheet(r, km);
+    };
+  });
+}
+
+// ══════════════════════════════════════
+// SKELETON LOADING
+// ══════════════════════════════════════
+function skeletonRows(n){
+  const rows=Array.from({length:n},()=>`
+    <div class="skel-row">
+      <div class="skel" style="width:24px;height:24px;border-radius:6px;flex-shrink:0"></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+        <div class="skel" style="height:12px;width:60%;border-radius:4px"></div>
+        <div class="skel" style="height:10px;width:35%;border-radius:4px"></div>
+      </div>
+      <div class="skel" style="width:52px;height:14px;border-radius:4px"></div>
+    </div>`).join('');
+  return `<div style="background:var(--s2);border:1px solid var(--b2);border-radius:14px;overflow:hidden">${rows}</div>`;
+}
+
+
+// ══════════════════════════════════════
+// ATHLETE DETAIL SHEET
+// ══════════════════════════════════════
+async function openAthleteSheet(r, km){
+  const overlay=document.getElementById('overlay');
+  const body=document.getElementById('sheetBody');
+  const tempo=r.melhorTempo||r.tempo||r.time||'—';
+  const g=r.gender||'';
+  const sheetKm=extrairKm(r.distance)||km;
+
+  // Render imediato com dados disponíveis
+  body.innerHTML=`
+    <div class="sh-name">${r.name}</div>
+    <div class="sh-meta">
+      ${g?`<span class="sh-tag ${g}">${g==='M'?'Masculino':'Feminino'}</span>`:''}
+      ${r.state?`<span style="color:var(--t3);font-size:12px">${UFn[r.state]||r.state}</span>`:''}
+      ${r.nivel?`<span class="sh-tag nivel">${r.nivel}</span>`:''}
+    </div>
+    <div class="sh-grid">
+      <div class="sh-stat"><div class="sh-sv">${formatTime(tempo)}</div><div class="sh-sl">Melhor tempo</div></div>
+      <div class="sh-stat"><div class="sh-sv" style="color:var(--green)">${calcVel(tempo,sheetKm)}</div><div class="sh-sl">Velocidade</div></div>
+      <div class="sh-stat"><div class="sh-sv" style="color:var(--t2)">${calcPace(tempo,sheetKm)}</div><div class="sh-sl">Pace</div></div>
+      <div class="sh-stat"><div class="sh-sv" style="color:var(--amber)">#${r.posicao||'—'}</div><div class="sh-sl">Posição</div></div>
+    </div>
+    <div id="sheetProvas"><div class="sh-section">Carregando provas...</div></div>
+    ${r.id?`<button class="sh-profile-btn" onclick="window.location.href='/perfil-atleta.html?id=${r.id}'">Ver perfil completo →</button>`:''}
+    <button class="sh-close" onclick="closeSheet()">Fechar</button>
+  `;
+  overlay.classList.add('open');
+
+  // Buscar provas do atleta se tiver ID — rota correta: /atleta/:id
+  if(r.id){
+    try{
+      const d=await fetch(`/atleta/${r.id}`).then(res=>res.json());
+      const provas=d.provas||[];
+      const provasHtml=provas.slice(0,5).map(p=>{
+        const pos=p.overallRank||'—';
+        const medal=pos<=3?MED[pos-1]:'';
+        const pKm=extrairKm(p.distance)||10;
+        const vel=calcVel(p.time,pKm);
+        return `<div class="sh-race">
+          <div class="sh-race-pos">${medal||'#'+pos}</div>
+          <div class="sh-race-info">
+            <div class="sh-race-name">${p.raceName||'—'}</div>
+            <div class="sh-race-sub">${p.distance||''} · ${p.raceCity||''} · ${p.raceDate?new Date(p.raceDate).getFullYear():''}</div>
+            ${vel!=='—'?`<div style="font-size:10px;color:var(--green);margin-top:2px">⚡ ${vel} · ${calcPace(p.time,pKm)}</div>`:''}
+          </div>
+          <div class="sh-race-time">${formatTime(p.time)||'—'}</div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('sheetProvas').innerHTML=
+        provas.length?`<div class="sh-section">Últimas provas</div>${provasHtml}`:'<div class="sh-section" style="color:var(--t3)">Sem provas registradas</div>';
+    }catch(e){
+      document.getElementById('sheetProvas').innerHTML='';
+    }
+  }
+}
+
+function closeSheet(e){
+  if(!e||e.target===document.getElementById('overlay'))
+    document.getElementById('overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════
+// START
+// ══════════════════════════════════════
+// Garantir que tab1 começa oculta (tab0 é ativa por padrão)
+const _t1 = document.getElementById('tab1');
+if (_t1) { _t1.style.display = 'none'; _t1.classList.add('hidden'); }
+
+init();
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+</script>
+</body>
+</html>

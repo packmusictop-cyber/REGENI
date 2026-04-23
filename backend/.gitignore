@@ -1,0 +1,27 @@
+node_modules/
+dev.db
+dev.db-journal
+.env
+uploads/
+.env
+.env.local
+*.key
+*.pem
+secrets/
+.env
+.env.production
+*.zip
+debug_*.mjs
+enrich_*.mjs
+total
+*.sh
+!scripts/cron-scrapers.sh
+cerebro/.obsidian/
+
+# Temporários
+test-screenshots/
+*.bak
+*.bak2
+*.bak3
+backups/**/*.csv*
+backups/**/*.gz

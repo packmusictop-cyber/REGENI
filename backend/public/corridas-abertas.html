@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>REGENI — Corridas</title>
+<meta name="theme-color" content="#CCFF00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:    #0a0a0a;
+  --bg2:   #111111;
+  --bg3:   #1a1a1a;
+  --card:  #111111;
+  --card2: #1a1a1a;
+  --b:     #222222;
+  --b2:    #2e2e2e;
+  --neon:  #CCFF00;
+  --neon2: #aadd00;
+  --orange:#ff6b35;
+  --red:   #ff4757;
+  --blue:  #4c9eff;
+  --yellow:#ffd60a;
+  --text:  #ffffff;
+  --dim:   #888888;
+  --f: 'DM Sans', sans-serif;
+  --fd: 'DM Sans', sans-serif;
+  --accent:#CCFF00;--surface:#111111;--border:#222222;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(64px + env(safe-area-inset-bottom,0px));
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(204,255,0,0.2);border-radius:4px}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:56px;
+  background:rgba(10,10,10,0.96);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--b);
+  display:flex;align-items:center;padding:0 16px;gap:10px;
+}
+.logo{
+  font-family:'DM Sans',sans-serif;font-size:20px;font-weight:900;
+  letter-spacing:3px;color:var(--neon);text-decoration:none;
+}
+.topbar-title{
+  font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;
+  flex:1;text-align:center;letter-spacing:.3px;
+}
+.icon-btn{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--bg3);border:1px solid var(--b);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;text-decoration:none;
+  transition:all .2s;flex-shrink:0;color:var(--text);
+}
+.icon-btn:hover{border-color:var(--neon);color:var(--neon)}
+
+/* ── SEARCH ── */
+.search-wrap{padding:68px 16px 12px;background:var(--bg)}
+.search-row{display:flex;gap:8px;margin-bottom:10px}
+.search-box{
+  flex:1;background:var(--bg3);border:1.5px solid var(--b);color:var(--text);
+  padding:11px 14px 11px 40px;border-radius:14px;
+  font-size:15px;font-family:'DM Sans',sans-serif;transition:border .2s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:13px center;
+  outline:none;
+}
+.search-box:focus{border-color:var(--neon)}
+.search-box::placeholder{color:var(--dim)}
+
+.btn-filtro{
+  background:var(--bg3);border:1.5px solid var(--b);color:var(--dim);
+  padding:11px 14px;border-radius:14px;font-size:13px;font-weight:600;
+  cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;
+  display:flex;align-items:center;gap:6px;transition:all .2s;
+}
+.btn-filtro.on,.btn-filtro:hover{border-color:var(--neon);color:var(--neon)}
+
+/* ── CHIPS ── */
+.chips-scroll{
+  overflow-x:auto;padding:0 16px 10px;display:flex;gap:8px;
+  scrollbar-width:none;max-width:100%;width:100%;
+}
+.chips-scroll::-webkit-scrollbar{display:none}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 14px;border-radius:20px;
+  font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;
+  border:1.5px solid var(--b);color:var(--dim);
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+  background:var(--bg3);flex-shrink:0;
+}
+.chip.on{
+  border-color:var(--neon);
+  color:#000;
+  background:var(--neon);
+}
+.chip:not(.on):hover{border-color:var(--b2);color:var(--text)}
+
+/* ── STATS BAR ── */
+.stats-bar{
+  display:flex;gap:0;
+  border-top:1px solid var(--b);border-bottom:1px solid var(--b);
+  background:var(--bg2);overflow-x:auto;scrollbar-width:none;
+}
+.stats-bar::-webkit-scrollbar{display:none}
+.stat-item{
+  flex:1;min-width:70px;padding:10px 8px;
+  text-align:center;border-right:1px solid var(--b);
+}
+.stat-item:last-child{border-right:none}
+.stat-n{
+  font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;
+  color:var(--neon);display:block;
+}
+.stat-l{
+  font-size:10px;color:var(--dim);font-weight:600;
+  letter-spacing:.5px;text-transform:uppercase;
+}
+
+/* ── LISTA ── */
+.corridas-list{padding:12px 14px 20px}
+
+/* ── CORRIDA CARD ── */
+.corrida-card{
+  background:var(--card);border:1.5px solid var(--b);border-radius:18px;
+  overflow:hidden;margin-bottom:10px;cursor:pointer;
+  transition:all .25s;position:relative;
+}
+.corrida-card:hover{border-color:var(--b2);transform:translateY(-2px)}
+.corrida-card:active{transform:scale(.98)}
+
+.card-img{width:100%;height:130px;object-fit:cover;display:block}
+.card-img-placeholder{
+  height:100px;display:flex;align-items:center;justify-content:center;
+  font-size:48px;background:linear-gradient(135deg,var(--bg3),var(--card2));
+}
+
+.card-body{padding:14px 16px}
+.card-estado-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  background:rgba(204,255,0,0.06);border:1px solid rgba(204,255,0,0.15);color:var(--neon);
+  padding:3px 8px;border-radius:6px;margin-bottom:8px;
+}
+.card-nome{
+  font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800;line-height:1.2;
+  margin-bottom:6px;
+}
+.card-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.meta-item{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--dim);font-weight:500}
+.meta-item b{color:var(--text);font-weight:600}
+.card-dists{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.dist-badge{
+  padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;
+  background:rgba(76,158,255,.1);border:1px solid rgba(76,158,255,.2);color:var(--blue);
+}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.preco-label{font-size:13px;color:var(--dim)}
+.preco-val{font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;color:var(--neon)}
+.btn-inscrever{
+  background:var(--neon);color:#000;border:none;
+  padding:10px 18px;border-radius:12px;
+  font-size:13px;font-weight:800;cursor:pointer;
+  transition:all .2s;letter-spacing:.2px;
+  display:flex;align-items:center;gap:6px;
+  text-decoration:none;font-family:'DM Sans',sans-serif;
+}
+.btn-inscrever:hover{background:var(--neon2);transform:scale(1.03)}
+
+.fav-btn{
+  position:absolute;top:12px;right:12px;
+  width:34px;height:34px;border-radius:10px;
+  background:rgba(10,10,10,.75);backdrop-filter:blur(10px);
+  border:1px solid var(--b);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;transition:all .2s;z-index:2;
+}
+.fav-btn.on{background:rgba(255,59,92,.15);border-color:rgba(255,59,92,.3)}
+
+/* ── PRAZO CHIP ── */
+.prazo-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;margin-left:auto;
+}
+.prazo-urgente{background:rgba(255,59,92,.12);border:1px solid rgba(255,59,92,.25);color:var(--red)}
+.prazo-ok{background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.2);color:var(--yellow)}
+.prazo-longe{background:rgba(204,255,0,.07);border:1px solid rgba(204,255,0,.15);color:var(--neon)}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:60px 24px;color:var(--dim)}
+.empty-ico{font-size:56px;margin-bottom:14px}
+.empty-ttl{
+  font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;
+  color:var(--text);margin-bottom:8px;
+}
+.empty-sub{font-size:14px;line-height:1.6}
+
+/* ── SKELETON ── */
+.skl{
+  background:linear-gradient(90deg,var(--bg3) 25%,var(--card) 50%,var(--bg3) 75%);
+  background-size:200% 100%;animation:shim 1.5s infinite;border-radius:18px;
+}
+@keyframes shim{0%{background-position:200%}100%{background-position:-200%}}
+
+/* ── LOAD MORE ── */
+.load-more-wrap{text-align:center;padding:8px 0 20px}
+.btn-load-more{
+  background:var(--bg3);border:1.5px solid var(--b);color:var(--dim);
+  padding:12px 28px;border-radius:14px;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;
+}
+.btn-load-more:hover{border-color:var(--neon);color:var(--neon)}
+
+/* ── MODAL DETALHE ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(8px);
+}
+.modal-overlay.open{display:flex;align-items:flex-end}
+.modal-sheet{
+  background:var(--bg2);border:1px solid var(--b);border-radius:24px 24px 0 0;
+  width:100%;max-height:90vh;overflow-y:auto;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--b2);margin:14px auto 0}
+.modal-img{width:100%;height:180px;object-fit:cover}
+.modal-img-ph{height:120px;display:flex;align-items:center;justify-content:center;font-size:64px;background:var(--bg3)}
+.modal-body{padding:18px 20px 24px}
+.modal-nome{font-family:'DM Sans',sans-serif;font-size:24px;font-weight:900;line-height:1.15;margin-bottom:12px}
+.modal-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.info-box{background:var(--bg3);border:1px solid var(--b);border-radius:12px;padding:12px}
+.info-box-ico{font-size:20px;margin-bottom:4px}
+.info-box-label{font-size:10px;color:var(--dim);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px}
+.info-box-val{font-size:14px;font-weight:700}
+.modal-dists{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.modal-dist{
+  padding:6px 14px;border-radius:10px;font-size:14px;font-weight:700;
+  background:rgba(76,158,255,.1);border:1px solid rgba(76,158,255,.25);color:var(--blue);
+}
+.modal-desc{font-size:14px;color:var(--dim);line-height:1.7;margin-bottom:16px}
+.btn-inscrever-full{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--neon);color:#000;border:none;padding:16px;border-radius:16px;
+  font-size:16px;font-weight:800;cursor:pointer;width:100%;text-decoration:none;
+  font-family:'DM Sans',sans-serif;letter-spacing:.3px;transition:all .2s;
+}
+.btn-inscrever-full:hover{background:var(--neon2)}
+.modal-fonte{text-align:center;font-size:11px;color:var(--dim);margin-top:10px}
+.modal-close{
+  position:absolute;top:60px;right:16px;width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.1);border:none;color:var(--text);font-size:18px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+
+/* ── PAINEL FILTRO ── */
+.filtro-panel{display:none;background:var(--bg2);border-top:1px solid var(--b);padding:16px}
+.filtro-panel.open{display:block}
+.filtro-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.filtro-sel{
+  background:var(--bg3);border:1.5px solid var(--b);color:var(--text);
+  padding:10px 12px;border-radius:12px;font-size:14px;
+  font-family:'DM Sans',sans-serif;width:100%;outline:none;
+}
+.filtro-sel:focus{border-color:var(--neon)}
+.btn-aplicar{
+  background:var(--neon);color:#000;border:none;padding:12px;border-radius:12px;
+  font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif;
+}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:999;pointer-events:none}
+.toast{
+  background:var(--card);border:1px solid var(--b2);border-radius:12px;
+  padding:10px 18px;font-size:13px;font-weight:600;color:var(--neon);
+  opacity:0;transform:translateY(8px);transition:all .3s;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.corrida-card{animation:fadeUp .3s ease both}
+
+/* ── BOTTOM NAV ── */
+.rg-bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;height:64px;
+  background:rgba(10,10,10,0.96);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--b);
+  display:flex;align-items:center;justify-content:space-around;
+  padding-bottom:env(safe-area-inset-bottom,0px);z-index:1000;
+}
+.rg-nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;text-decoration:none;color:#444;font-size:0.625rem;font-weight:700;
+  font-family:'DM Sans',system-ui,sans-serif;letter-spacing:.3px;
+  transition:color .2s;padding:4px 0;
+}
+.rg-nav-item span:first-child{font-size:22px;line-height:1}
+.rg-nav-item.active,.rg-nav-item:hover{color:var(--neon)}
+
+@media(min-width:600px){
+  .modal-overlay{align-items:center}
+  .modal-sheet{border-radius:20px;max-width:500px;margin:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="/atleta.html" class="icon-btn">←</a>
+  <span class="topbar-title">🏁 Corridas Abertas</span>
+  <div class="icon-btn" id="adminBtn" style="display:none;font-size:13px" onclick="abrirAdmin()">⚙️</div>
+</header>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <div class="search-row">
+    <input class="search-box" id="searchInput" placeholder="Buscar corrida, cidade, estado..."
+      oninput="debounceSearch()">
+    <button class="btn-filtro" id="filtroBtn" onclick="toggleFiltro()">⚙️ Filtros</button>
+  </div>
+
+  <!-- PAINEL DE FILTROS -->
+  <div class="filtro-panel" id="filtroPanel">
+    <div class="filtro-row">
+      <select class="filtro-sel" id="filtroEstado">
+        <option value="">Todos os estados</option>
+        <option value="SE">Sergipe</option>
+        <option value="SP">São Paulo</option>
+        <option value="RJ">Rio de Janeiro</option>
+        <option value="MG">Minas Gerais</option>
+        <option value="RS">Rio Grande do Sul</option>
+        <option value="PR">Paraná</option>
+        <option value="SC">Santa Catarina</option>
+        <option value="CE">Ceará</option>
+        <option value="BA">Bahia</option>
+        <option value="PE">Pernambuco</option>
+        <option value="GO">Goiás</option>
+        <option value="DF">Distrito Federal</option>
+        <option value="AL">Alagoas</option>
+        <option value="MA">Maranhão</option>
+        <option value="PA">Pará</option>
+        <option value="MT">Mato Grosso</option>
+        <option value="MS">Mato Grosso do Sul</option>
+        <option value="RN">Rio Grande do Norte</option>
+        <option value="PB">Paraíba</option>
+        <option value="PI">Piauí</option>
+        <option value="ES">Espírito Santo</option>
+        <option value="AM">Amazonas</option>
+      </select>
+      <select class="filtro-sel" id="filtroMes">
+        <option value="">Todos os meses</option>
+        <option value="3">Março</option>
+        <option value="4">Abril</option>
+        <option value="5">Maio</option>
+        <option value="6">Junho</option>
+        <option value="7">Julho</option>
+        <option value="8">Agosto</option>
+        <option value="9">Setembro</option>
+        <option value="10">Outubro</option>
+        <option value="11">Novembro</option>
+        <option value="12">Dezembro</option>
+      </select>
+    </div>
+    <div class="filtro-row">
+      <select class="filtro-sel" id="filtroDistancia">
+        <option value="">Todas distâncias</option>
+        <option value="3km">3km</option>
+        <option value="5km">5km</option>
+        <option value="10km">10km</option>
+        <option value="15km">15km</option>
+        <option value="21km">21km (Meia)</option>
+        <option value="42km">42km (Maratona)</option>
+      </select>
+      <select class="filtro-sel" id="filtroOrder">
+        <option value="data">Por data</option>
+        <option value="preco">Menor preço</option>
+      </select>
+    </div>
+    <button class="btn-aplicar" onclick="aplicarFiltros()">🔍 Aplicar Filtros</button>
+  </div>
+</div>
+
+<!-- CHIPS RÁPIDOS -->
+<div class="chips-scroll" id="chipsEstado">
+  <div class="chip on" data-est="" onclick="setEstadoChip(this,'')">🇧🇷 Todos</div>
+  <div class="chip" data-est="SE" onclick="setEstadoChip(this,'SE')">📍 Sergipe</div>
+  <div class="chip" data-est="SP" onclick="setEstadoChip(this,'SP')">📍 São Paulo</div>
+  <div class="chip" data-est="RJ" onclick="setEstadoChip(this,'RJ')">📍 Rio</div>
+  <div class="chip" data-est="MG" onclick="setEstadoChip(this,'MG')">📍 MG</div>
+  <div class="chip" data-est="RS" onclick="setEstadoChip(this,'RS')">📍 RS</div>
+  <div class="chip" data-est="CE" onclick="setEstadoChip(this,'CE')">📍 CE</div>
+  <div class="chip" data-est="BA" onclick="setEstadoChip(this,'BA')">📍 BA</div>
+  <div class="chip" data-est="PR" onclick="setEstadoChip(this,'PR')">📍 PR</div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar" id="statsBar">
+  <div class="stat-item"><span class="stat-n" id="statTotal">—</span><span class="stat-l">Corridas</span></div>
+  <div class="stat-item"><span class="stat-n" id="statEstados">—</span><span class="stat-l">Estados</span></div>
+  <div class="stat-item"><span class="stat-n" id="statMes">—</span><span class="stat-l">Este mês</span></div>
+</div>
+
+<!-- LISTA -->
+<div class="corridas-list" id="corridasList">
+  <div class="skl" style="height:160px;margin-bottom:10px"></div>
+  <div class="skl" style="height:160px;margin-bottom:10px"></div>
+  <div class="skl" style="height:160px;margin-bottom:10px"></div>
+</div>
+
+<div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+  <button class="btn-load-more" onclick="loadMore()">Carregar mais corridas</button>
+</div>
+
+<!-- MODAL DETALHE -->
+<div class="modal-overlay" id="modalDetalhe">
+  <div class="modal-sheet" id="modalContent">
+    <div class="modal-handle"></div>
+    <div id="modalInner"></div>
+  </div>
+  <button class="modal-close" onclick="fecharModal()">✕</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap"><div class="toast" id="toast"></div></div>
+
+<!-- NAV UNIFICADA -->
+<nav class="rg-bottom-nav">
+  <a href="/" class="rg-nav-item" id="nav-home"><span>🏠</span><span>Início</span></a>
+  <a href="/resultados.html" class="rg-nav-item" id="nav-resultados"><span>🔍</span><span>Resultados</span></a>
+  <a href="/atleta.html" class="rg-nav-item" id="nav-atleta"><span>👤</span><span>Atleta</span></a>
+  <a href="/corridas-abertas.html" class="rg-nav-item" id="nav-corridas"><span>🏁</span><span>Corridas</span></a>
+</nav>
+<script>(function(){var m={'/' :'nav-home','/resultados.html':'nav-resultados','/atleta.html':'nav-atleta','/corridas-abertas.html':'nav-corridas'};var el=document.getElementById(m[location.pathname]);if(el)el.classList.add('active');})();</script>
+
+<script>
+// ══════════════════════════════════
+// ESTADO
+// ══════════════════════════════════
+const TOKEN = localStorage.getItem('pace_token');
+const ME = JSON.parse(localStorage.getItem('pace_user') || '{}');
+const ADMIN_KEY = '3b77d62cb40acbbe091abf119204cd5fd3371c47e68e47cf9698088a1d1a18d6';
+
+let filtros = { estado: '', mes: '', distancia: '', busca: '', orderBy: 'data' };
+let pagina = 1;
+let totalPaginas = 1;
+let favoritados = new Set();
+let searchTimer = null;
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+async function init() {
+  carregarStats();
+  carregarCorridas(true);
+  if (TOKEN) carregarFavoritos();
+
+  // Detectar estado do usuário se disponível
+  const user = JSON.parse(localStorage.getItem('pace_user') || '{}');
+  if (user.state) {
+    filtros.estado = user.state;
+    document.querySelectorAll('#chipsEstado .chip').forEach(c => {
+      c.classList.toggle('on', c.dataset.est === user.state);
+    });
+    document.getElementById('filtroEstado').value = user.state;
+  }
+}
+
+// ══════════════════════════════════
+// API
+// ══════════════════════════════════
+async function api(path, opts = {}) {
+  const res = await fetch(path, {
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN||''}`, ...opts.headers },
+    ...opts
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+// ══════════════════════════════════
+// CARREGAR CORRIDAS
+// ══════════════════════════════════
+async function carregarCorridas(reset = false) {
+  if (reset) { pagina = 1; }
+
+  const params = new URLSearchParams({ page: pagina, limit: 20, orderBy: filtros.orderBy });
+  if (filtros.estado) params.set('estado', filtros.estado);
+  if (filtros.mes) params.set('mes', filtros.mes);
+  if (filtros.distancia) params.set('distancia', filtros.distancia.replace('km',''));
+  if (filtros.busca) params.set('busca', filtros.busca);
+
+  const el = document.getElementById('corridasList');
+
+  if (reset) {
+    el.innerHTML = `<div class="skl" style="height:160px;margin-bottom:10px"></div>
+                    <div class="skl" style="height:160px;margin-bottom:10px"></div>
+                    <div class="skl" style="height:160px;margin-bottom:10px"></div>`;
+  }
+
+  try {
+    const data = await api(`/corridas-abertas?${params}`);
+    const corridas = data.corridas || [];
+    totalPaginas = data.paginas || 1;
+
+    if (reset) el.innerHTML = '';
+
+    if (!corridas.length && reset) {
+      el.innerHTML = `<div class="empty">
+        <div class="empty-ico">🏁</div>
+        <div class="empty-ttl">Nenhuma corrida encontrada</div>
+        <div class="empty-sub">Tente outro filtro ou aguarde o buscador encontrar novas corridas na sua região.</div>
+      </div>`;
+      document.getElementById('loadMoreWrap').style.display = 'none';
+      return;
+    }
+
+    corridas.forEach((c, i) => {
+      const card = criarCard(c, i);
+      el.appendChild(card);
+    });
+
+    document.getElementById('loadMoreWrap').style.display = pagina < totalPaginas ? 'flex' : 'none';
+
+  } catch(e) {
+    if (reset) el.innerHTML = `<div class="empty"><div class="empty-ico">😬</div><div class="empty-ttl">Erro ao carregar</div><div class="empty-sub">${e.message}</div></div>`;
+  }
+}
+
+function loadMore() {
+  pagina++;
+  carregarCorridas(false);
+}
+
+// ══════════════════════════════════
+// CRIAR CARD
+// ══════════════════════════════════
+function criarCard(c, idx) {
+  const div = document.createElement('div');
+  div.className = 'corrida-card';
+  div.style.animationDelay = `${idx * 0.04}s`;
+
+  const dataObj = new Date(c.data);
+  const diasRestantes = Math.ceil((dataObj - new Date()) / 86400000);
+  const dataFmt = dataObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const isFav = favoritados.has(c.id);
+
+  let prazoBadge = '';
+  if (diasRestantes <= 7) prazoBadge = `<span class="prazo-chip prazo-urgente">🔥 ${diasRestantes}d</span>`;
+  else if (diasRestantes <= 30) prazoBadge = `<span class="prazo-chip prazo-ok">⏳ ${diasRestantes}d</span>`;
+  else prazoBadge = `<span class="prazo-chip prazo-longe">📅 ${diasRestantes}d</span>`;
+
+  const dists = (c.distancias || '').split(',').filter(d => d.trim()).map(d =>
+    `<span class="dist-badge">${d.trim()}</span>`).join('');
+
+  const precoHtml = c.preco && c.preco > 0
+    ? `<div><div class="preco-label">A partir de</div><div class="preco-val">R$ ${c.preco.toFixed(2).replace('.',',')}</div></div>`
+    : ``;
+
+  const imgHtml = c.imageUrl
+    ? `<img class="card-img" src="${c.imageUrl}" alt="${c.nome}" onerror="this.parentElement.innerHTML='<div class=\\'card-img-placeholder\\'>🏁</div>'">`
+    : `<div class="card-img-placeholder">🏁</div>`;
+
+  div.innerHTML = `
+    ${imgHtml}
+    <button class="fav-btn ${isFav ? 'on' : ''}" onclick="toggleFav(event,'${c.id}',this)" title="Favoritar">
+      ${isFav ? '❤️' : '🤍'}
+    </button>
+    <div class="card-body">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span class="card-estado-badge">📍 ${c.cidade || c.estado}/${c.estado}</span>
+        ${prazoBadge}
+      </div>
+      <div class="card-nome">${c.nome}</div>
+      <div class="card-meta">
+        <div class="meta-item">📅 <b>${dataFmt}</b></div>
+        ${c.organizador ? `<div class="meta-item">👤 ${c.organizador}</div>` : ''}
+        <div class="meta-item">🔗 ${c.fonte || 'manual'}</div>
+      </div>
+      ${dists ? `<div class="card-dists">${dists}</div>` : ''}
+      <div class="card-footer">
+        ${precoHtml}
+        <button class="btn-inscrever" onclick="abrirDetalhe('${c.id}')">
+          Ver Detalhes →
+        </button>
+      </div>
+    </div>`;
+
+  div.addEventListener('click', e => {
+    if (!e.target.closest('.fav-btn') && !e.target.closest('.btn-inscrever')) {
+      abrirDetalhe(c.id);
+    }
+  });
+
+  return div;
+}
+
+// ══════════════════════════════════
+// DETALHE / MODAL
+// ══════════════════════════════════
+async function abrirDetalhe(id) {
+  document.getElementById('modalDetalhe').classList.add('open');
+  document.getElementById('modalInner').innerHTML = `<div style="text-align:center;padding:40px;color:var(--dim)">Carregando...</div>`;
+
+  try {
+    const c = await api(`/corridas-abertas/${id}`);
+    const dataFmt = new Date(c.data).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const diasRestantes = Math.ceil((new Date(c.data) - new Date()) / 86400000);
+    const dists = (c.distancias || '').split(',').filter(d => d.trim()).map(d =>
+      `<span class="modal-dist">${d.trim()}</span>`).join('');
+
+    const precoHtml = c.preco && c.preco > 0
+      ? `<div class="info-box-val">R$ ${c.preco.toFixed(2).replace('.',',')}</div>`
+      : `<div class="info-box-val" style="color:var(--dim)">—</div>`;
+
+    const vagasHtml = c.vagasRestantes > 0
+      ? `<span style="color:var(--neon);font-weight:700">${c.vagasRestantes} vagas restantes</span>`
+      : c.vagasTotal > 0 ? `<span style="color:var(--red)">Vagas esgotadas</span>` : '';
+
+    const checklistHtml = (() => {
+      try {
+        const items = typeof c.checklist === 'string' ? JSON.parse(c.checklist) : (c.checklist || []);
+        return items.length ? `<div style="margin:12px 0">
+          <div style="font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:700">✅ O que vem no kit</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">${items.map(i=>`<span style="background:rgba(204,255,0,.08);border:1px solid rgba(204,255,0,.15);color:var(--neon);padding:3px 10px;border-radius:20px;font-size:12px">✓ ${i}</span>`).join('')}</div>
+        </div>` : '';
+      } catch { return ''; }
+    })();
+
+    const faixasHtml = (() => {
+      try {
+        const fa = typeof c.faixasEtarias === 'string' ? JSON.parse(c.faixasEtarias) : (c.faixasEtarias || []);
+        return fa.length ? `<div style="margin:12px 0">
+          <div style="font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:700">👥 Faixas Etárias</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">${fa.map(f=>`<span style="background:var(--bg3);border:1px solid var(--b);padding:3px 10px;border-radius:20px;font-size:12px">${f}</span>`).join('')}</div>
+        </div>` : '';
+      } catch { return ''; }
+    })();
+
+    document.getElementById('modalInner').innerHTML = `
+      ${c.imageUrl ? `<img class="modal-img" src="${c.imageUrl}" alt="${c.nome}" onerror="this.style.display='none'">` : '<div class="modal-img-ph">🏁</div>'}
+      <div class="modal-body">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px">
+          <div style="flex:1">
+            <div class="modal-nome">${c.nome}</div>
+            ${c.edicaoNumero ? `<div style="font-size:12px;color:var(--dim)">${c.edicaoNumero}ª Edição</div>` : ''}
+          </div>
+          ${c.podioGeral ? `<span style="background:rgba(255,214,0,.15);color:#ffd600;border:1px solid rgba(255,214,0,.3);padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;flex-shrink:0">🏆 Pódio Geral</span>` : ''}
+        </div>
+
+        <div class="modal-info-grid">
+          <div class="info-box">
+            <div class="info-box-ico">📅</div>
+            <div class="info-box-label">Data</div>
+            <div class="info-box-val" style="font-size:13px">${dataFmt}</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-ico">⏳</div>
+            <div class="info-box-label">Faltam</div>
+            <div class="info-box-val" style="color:${diasRestantes <= 7 ? 'var(--red)' : diasRestantes <= 30 ? 'var(--yellow)' : 'var(--neon)'}">${diasRestantes}d</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-ico">📍</div>
+            <div class="info-box-label">Local</div>
+            <div class="info-box-val" style="font-size:12px">${c.cidade || '—'}/${c.estado}</div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-ico">💰</div>
+            <div class="info-box-label">Inscrição</div>
+            ${precoHtml}
+          </div>
+          ${c.horarioLargada ? `<div class="info-box"><div class="info-box-ico">🕐</div><div class="info-box-label">Largada</div><div class="info-box-val">${c.horarioLargada}</div></div>` : ''}
+          ${c.tipoPiso ? `<div class="info-box"><div class="info-box-ico">🛣️</div><div class="info-box-label">Piso</div><div class="info-box-val" style="font-size:12px">${c.tipoPiso}</div></div>` : ''}
+          ${c.tipoPerfil ? `<div class="info-box"><div class="info-box-ico">📐</div><div class="info-box-label">Perfil</div><div class="info-box-val" style="font-size:12px">${c.tipoPerfil}</div></div>` : ''}
+          ${c.pontoAgua ? `<div class="info-box"><div class="info-box-ico">💧</div><div class="info-box-label">Hidratação</div><div class="info-box-val" style="font-size:11px">${c.pontoAgua}</div></div>` : ''}
+        </div>
+
+        ${dists ? `<div class="modal-dists">${dists}</div>` : ''}
+
+        ${vagasHtml ? `<div style="background:rgba(204,255,0,.05);border:1px solid rgba(204,255,0,.12);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:13px">${vagasHtml}${c.vagasTotal?` de ${c.vagasTotal} vagas`:''}</div>` : ''}
+
+        ${c.temKit ? `<div style="display:flex;align-items:center;gap:8px;background:rgba(68,138,255,.08);border:1px solid rgba(68,138,255,.2);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:13px"><span style="font-size:18px">🎽</span><div><div style="font-weight:700;color:#448aff">Kit do Corredor incluso</div><div style="font-size:11px;color:var(--dim)">Camisa, número e brindes</div></div></div>` : ''}
+
+        ${c.certificado ? `<div style="display:flex;align-items:center;gap:8px;background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.2);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:13px"><span style="font-size:18px">🏅</span><div><div style="font-weight:700;color:#ffd600">Certificado de conclusão</div><div style="font-size:11px;color:var(--dim)">Emitido digitalmente</div></div></div>` : ''}
+
+        ${checklistHtml}
+        ${faixasHtml}
+
+        ${c.descricao ? `<div class="modal-desc">${c.descricao}</div>` : ''}
+        ${c.organizador ? `<div style="font-size:13px;color:var(--dim);margin:8px 0">👤 Organização: <b style="color:var(--text)">${c.organizador}</b></div>` : ''}
+
+        ${c.regulamentoTexto ? `<details style="margin:12px 0"><summary style="font-size:12px;color:var(--neon);cursor:pointer;font-weight:700">📄 Ver Regulamento</summary><div style="font-size:12px;color:var(--dim);margin-top:8px;line-height:1.6;white-space:pre-wrap">${c.regulamentoTexto.substring(0,500)}...</div></details>` : ''}
+
+        <a href="${c.linkInscricao}" target="_blank" class="btn-inscrever-full" style="margin-top:16px">
+          🏁 Ir para Inscrição
+        </a>
+
+        ${c.whatsapp || c.instagram ? `
+        <div style="display:flex;gap:8px;margin-top:10px">
+          ${c.whatsapp ? `<a href="https://wa.me/${c.whatsapp.replace(/\D/g,'')}" target="_blank" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.25);color:#25d366;padding:10px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none">💬 WhatsApp</a>` : ''}
+          ${c.instagram ? `<a href="https://instagram.com/${c.instagram.replace('@','')}" target="_blank" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(225,48,108,.12);border:1px solid rgba(225,48,108,.25);color:#e1306c;padding:10px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none">📸 Instagram</a>` : ''}
+        </div>` : ''}
+
+        <div class="modal-fonte">via ${c.fonte || 'REGENI'} · ${new Date(c.atualizadoEm||c.criadoEm||Date.now()).toLocaleDateString('pt-BR')}</div>
+      </div>`;
+
+  } catch(e) {
+    document.getElementById('modalInner').innerHTML = `<div style="padding:40px;text-align:center;color:var(--dim)">Erro ao carregar</div>`;
+  }
+}
+
+function fecharModal() {
+  document.getElementById('modalDetalhe').classList.remove('open');
+}
+document.getElementById('modalDetalhe').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalDetalhe')) fecharModal();
+});
+
+// ══════════════════════════════════
+// STATS
+// ══════════════════════════════════
+async function carregarStats() {
+  try {
+    const [all, mesAtual] = await Promise.all([
+      api('/corridas-abertas?limit=1'),
+      api(`/corridas-abertas?mes=${new Date().getMonth()+1}&limit=1`),
+    ]);
+    const estats = await api('/corridas-abertas/stats/estados').catch(() => ({ estados: [] }));
+    document.getElementById('statTotal').textContent = all.total || '—';
+    document.getElementById('statEstados').textContent = estats.estados?.length || '—';
+    document.getElementById('statMes').textContent = mesAtual.total || '—';
+  } catch {}
+}
+
+// ══════════════════════════════════
+// FAVORITOS
+// ══════════════════════════════════
+async function carregarFavoritos() {
+  try {
+    const data = await api('/corridas-abertas/meus/favoritos');
+    (data.corridas || []).forEach(c => favoritados.add(c.id));
+  } catch {}
+}
+
+async function toggleFav(e, id, btn) {
+  e.stopPropagation();
+  if (!TOKEN) { toast('Login necessário para favoritar'); return; }
+  try {
+    const data = await api(`/corridas-abertas/${id}/favoritar`, { method: 'POST' });
+    if (data.favoritado) { favoritados.add(id); btn.innerHTML = '❤️'; btn.classList.add('on'); toast('❤️ Favoritado!'); }
+    else { favoritados.delete(id); btn.innerHTML = '🤍'; btn.classList.remove('on'); toast('Removido dos favoritos'); }
+  } catch(e) { toast('❌ ' + e.message); }
+}
+
+// ══════════════════════════════════
+// FILTROS
+// ══════════════════════════════════
+function toggleFiltro() {
+  const p = document.getElementById('filtroPanel');
+  const btn = document.getElementById('filtroBtn');
+  p.classList.toggle('open');
+  btn.classList.toggle('on', p.classList.contains('open'));
+}
+
+function aplicarFiltros() {
+  filtros.estado = document.getElementById('filtroEstado').value;
+  filtros.mes = document.getElementById('filtroMes').value;
+  filtros.distancia = document.getElementById('filtroDistancia').value;
+  filtros.orderBy = document.getElementById('filtroOrder').value;
+  toggleFiltro();
+  // Sincronizar chips
+  document.querySelectorAll('#chipsEstado .chip').forEach(c => {
+    c.classList.toggle('on', c.dataset.est === filtros.estado);
+  });
+  carregarCorridas(true);
+}
+
+function setEstadoChip(el, estado) {
+  document.querySelectorAll('#chipsEstado .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  filtros.estado = estado;
+  document.getElementById('filtroEstado').value = estado;
+  carregarCorridas(true);
+}
+
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    filtros.busca = document.getElementById('searchInput').value;
+    carregarCorridas(true);
+  }, 400);
+}
+
+// ══════════════════════════════════
+// ADMIN
+// ══════════════════════════════════
+function abrirAdmin() {
+  const url = prompt('Rodar scraper agora? Digite o estado (ex: SE) ou deixe vazio para todos:', '');
+  if (url === null) return;
+  fetch('/corridas-abertas/scraper/rodar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': ADMIN_KEY },
+    body: JSON.stringify({ estados: url ? [url.toUpperCase()] : null })
+  }).then(r => r.json()).then(d => {
+    toast(d.success ? '🚀 Scraper iniciado!' : '❌ ' + (d.error || 'Erro'));
+    if (d.success) setTimeout(() => verificarProgresso(), 3000);
+  });
+}
+
+async function verificarProgresso() {
+  try {
+    const data = await fetch('/corridas-abertas/scraper/status', {
+      headers: { 'x-admin-key': ADMIN_KEY }
+    }).then(r => r.json());
+    if (data.rodando) {
+      toast(`⏳ ${data.progresso?.fase || 'Buscando...'}`);
+      setTimeout(() => verificarProgresso(), 5000);
+    } else {
+      toast(`✅ Scraper concluído! ${data.totalAtivo} corridas`);
+      carregarCorridas(true); carregarStats();
+    }
+  } catch {}
+}
+
+// Mostrar botão admin se for admin
+if (ME.isAdmin || localStorage.getItem('pace_admin')) {
+  document.getElementById('adminBtn').style.display = 'flex';
+}
+
+// ══════════════════════════════════
+// TOAST
+// ══════════════════════════════════
+function toast(msg, dur = 2800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ══════════════════════════════════
+// START
+// ══════════════════════════════════
+init();
+</script>
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+</body>
+</html>
