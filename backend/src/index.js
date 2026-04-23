@@ -7,6 +7,21 @@ process.on("uncaughtException", e => { console.error("❌ CRASH:", e); });
 if (!process.env.DATABASE_URL) { console.error("❌ DATABASE_URL não configurada!"); process.exit(1); }
 if (!process.env.JWT_SECRET) console.warn("⚠️ JWT_SECRET não configurado");
 
+async function initDb() {
+  const { PrismaClient } = await import('@prisma/client');
+  const prisma = new PrismaClient();
+  try {
+    await prisma.$connect();
+    console.log('✅ Banco de dados conectado');
+    await prisma.$disconnect();
+  } catch(e) {
+    console.log('📦 Criando tabelas no banco...');
+    const { execSync } = await import('child_process');
+    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+    console.log('✅ Tabelas criadas!');
+  }
+}
+
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import fs from 'fs';
@@ -53,6 +68,7 @@ for (const pg of ['index','entrar','resultados','corridas-abertas']) {
 }
 
 try {
+  await initDb();
   await app.register(authRoutes);
   await app.register(raceRoutes);
   await app.register(resultsRoutes);
