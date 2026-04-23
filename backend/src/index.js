@@ -8,17 +8,15 @@ if (!process.env.DATABASE_URL) { console.error("❌ DATABASE_URL não configurad
 if (!process.env.JWT_SECRET) console.warn("⚠️ JWT_SECRET não configurado");
 
 async function initDb() {
-  const { PrismaClient } = await import('@prisma/client');
-  const prisma = new PrismaClient();
-  console.log('📦 Criando/atualizando schema do banco...');
+  console.log('📦 Verificando schema do banco...');
   const { execSync } = await import('child_process');
   try {
     execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
     console.log('✅ Schema do banco atualizado!');
   } catch(err) {
     console.error('❌ Erro ao criar schema:', err.message);
+    process.exit(1);
   }
-  await prisma.$disconnect();
 }
 
 import Fastify from 'fastify';
