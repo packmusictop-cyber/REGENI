@@ -13,12 +13,24 @@ if (!dbUrl) {
 process.env.DATABASE_URL = dbUrl;
 console.log("✅ DATABASE_URL configurada");
 
-async function initDb() {
-  console.log('📦 Criando schema...');
-  const { execSync } = await import('child_process');
-  execSync('npx prisma db push --force-reset', { stdio: 'inherit' });
-  console.log('✅ Schema criado!');
+import { PrismaClient } from '@prisma/client';
+
+async function ensureDb() {
+  const prisma = new PrismaClient();
+  try {
+    await prisma.$connect();
+    await prisma.race.findFirst();
+    console.log('✅ Banco OK!');
+  } catch(e) {
+    console.log('📦 Criando tabelas...');
+    const { execSync } = await import('child_process');
+    execSync('npx prisma db push --force-reset', { stdio: 'inherit' });
+    console.log('✅ Tabelas criadas!');
+  }
+  await prisma.$disconnect();
 }
+
+await ensureDb();
 
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
