@@ -15,19 +15,9 @@ console.log("✅ DATABASE_URL configurada");
 
 async function initDb() {
   console.log('📦 Criando schema...');
-  const { PrismaClient } = await import('@prisma/client');
-  const prisma = new PrismaClient();
-  
-  try {
-    await prisma.$connect();
-    const tables = await prisma.$queryRaw`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`;
-    console.log('✅ Banco conectado! Tabelas:', tables.length);
-  } catch(e) {
-    console.log('📦 Criando tabelas...');
-    const { execSync } = await import('child_process');
-    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
-  }
-  await prisma.$disconnect();
+  const { execSync } = await import('child_process');
+  execSync('npx prisma db push --force-reset', { stdio: 'inherit' });
+  console.log('✅ Schema criado!');
 }
 
 import Fastify from 'fastify';
