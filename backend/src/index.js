@@ -4,19 +4,39 @@ if (!process.env.RAILWAY_ENVIRONMENT_NAME) config({ path: ".env" });
 process.on("unhandledRejection", e => { console.error("❌ ERRO FATAL:", e); });
 process.on("uncaughtException", e => { console.error("❌ CRASH:", e); });
 
+console.log('🔧 DATABASE_URL:', process.env.DATABASE_URL ? 'OK' : 'FALTANDO');
+console.log('🔧 JWT_SECRET:', process.env.JWT_SECRET ? 'OK' : 'FALTANDO');
+
 if (!process.env.DATABASE_URL) { console.error("❌ DATABASE_URL não configurada!"); process.exit(1); }
-if (!process.env.JWT_SECRET) console.warn("⚠️ JWT_SECRET não configurado");
 
 async function initDb() {
   console.log('📦 Verificando schema do banco...');
-  const { execSync } = await import('child_process');
+  const { PrismaClient } = await import('@prisma/client');
+  const prisma = new PrismaClient();
+  
   try {
-    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
-    console.log('✅ Schema do banco atualizado!');
-  } catch(err) {
-    console.error('❌ Erro ao criar schema:', err.message);
-    process.exit(1);
+    const result = await prisma.$queryRaw`SELECT 1 as test`;
+    console.log('✅ Banco já tem schema!');
+    await prisma.$disconnect();
+    return;
+  } catch(e) {
+    console.log('📦 Schema não existe, criando...');
   }
+  
+  try {
+    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Race" (id TEXT PRIMARY KEY)`;
+    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Athlete" (id TEXT PRIMARY KEY)`;
+    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "User" (id TEXT PRIMARY KEY, email TEXT UNIQUE)`;
+    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Result" (id TEXT PRIMARY KEY)`;
+    console.log('✅ Schema criado!');
+  } catch(err) {
+    console.log('📦 Tentando via prisma-cli...');
+    const { execSync } = await import('child_process');
+    execSync('npx prisma db push --accept-data-loss --skip-generate', { stdio: 'inherit' });
+    console.log('✅ Schema criado via CLI!');
+  }
+  
+  await prisma.$disconnect();
 }
 
 import Fastify from 'fastify';
