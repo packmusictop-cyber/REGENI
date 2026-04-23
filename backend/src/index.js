@@ -1,41 +1,33 @@
 import { config } from "dotenv";
-if (!process.env.RAILWAY_ENVIRONMENT_NAME) config({ path: ".env" });
+config({ path: ".env" });
 
 process.on("unhandledRejection", e => { console.error("❌ ERRO FATAL:", e); });
 process.on("uncaughtException", e => { console.error("❌ CRASH:", e); });
 
-console.log('🔧 DATABASE_URL:', process.env.DATABASE_URL ? 'OK' : 'FALTANDO');
-console.log('🔧 JWT_SECRET:', process.env.JWT_SECRET ? 'OK' : 'FALTANDO');
+const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_AWS || process.env.DATABASE_URL_RENDER;
+if (!dbUrl) { 
+  console.error("❌ DATABASE_URL não configurada!"); 
+  console.log("Available env:", Object.keys(process.env).filter(k => k.includes('DATABASE') || k.includes('URL')));
+  process.exit(1); 
+}
 
-if (!process.env.DATABASE_URL) { console.error("❌ DATABASE_URL não configurada!"); process.exit(1); }
+process.env.DATABASE_URL = dbUrl;
+console.log("✅ DATABASE_URL configurada");
 
 async function initDb() {
-  console.log('📦 Verificando schema do banco...');
+  console.log('📦 Criando schema...');
   const { PrismaClient } = await import('@prisma/client');
   const prisma = new PrismaClient();
   
   try {
-    const result = await prisma.$queryRaw`SELECT 1 as test`;
-    console.log('✅ Banco já tem schema!');
-    await prisma.$disconnect();
-    return;
+    await prisma.$connect();
+    const tables = await prisma.$queryRaw`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`;
+    console.log('✅ Banco conectado! Tabelas:', tables.length);
   } catch(e) {
-    console.log('📦 Schema não existe, criando...');
-  }
-  
-  try {
-    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Race" (id TEXT PRIMARY KEY)`;
-    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Athlete" (id TEXT PRIMARY KEY)`;
-    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "User" (id TEXT PRIMARY KEY, email TEXT UNIQUE)`;
-    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "Result" (id TEXT PRIMARY KEY)`;
-    console.log('✅ Schema criado!');
-  } catch(err) {
-    console.log('📦 Tentando via prisma-cli...');
+    console.log('📦 Criando tabelas...');
     const { execSync } = await import('child_process');
-    execSync('npx prisma db push --accept-data-loss --skip-generate', { stdio: 'inherit' });
-    console.log('✅ Schema criado via CLI!');
+    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
   }
-  
   await prisma.$disconnect();
 }
 
