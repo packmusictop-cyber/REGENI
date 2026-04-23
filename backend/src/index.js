@@ -22,10 +22,10 @@ async function ensureDb() {
     await prisma.race.findFirst();
     console.log('✅ Banco OK!');
   } catch(e) {
-    console.log('📦 Criando tabelas...');
+    console.log('📦 Criando tabelas (erro: '+e.message+')...');
     const { execSync } = await import('child_process');
-    execSync('npx prisma db push --force-reset', { stdio: 'inherit' });
-    console.log('✅ Tabelas criadas!');
+    const output = execSync('npx prisma db push --force-reset', { stdio: 'pipe' });
+    console.log('✅ Output:', output.toString());
   }
   await prisma.$disconnect();
 }
