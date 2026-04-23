@@ -9,23 +9,30 @@ if (!dbUrl) {
   console.error("❌ DATABASE_URL não configurada!"); 
   process.exit(1); 
 }
-
 process.env.DATABASE_URL = dbUrl;
-console.log("✅ DATABASE_URL configurada");
+console.log("✅ DATABASE_URL OK");
 
 import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
 async function ensureDb() {
-  const prisma = new PrismaClient();
   try {
     await prisma.$connect();
-    await prisma.race.findFirst();
-    console.log('✅ Banco OK!');
+    await prisma.race.findFirst({ take: 1 });
+    console.log('✅ Banco já tem tabelas!');
   } catch(e) {
-    console.log('📦 Criando tabelas (erro: '+e.message+')...');
-    const { execSync } = await import('child_process');
-    const output = execSync('npx prisma db push --force-reset', { stdio: 'pipe' });
-    console.log('✅ Output:', output.toString());
+    console.log('📦 Criando tabelas via SQL direto...');
+    const tables = [
+      `CREATE TABLE IF NOT EXISTS "User" (id TEXT PRIMARY KEY, email TEXT UNIQUE, "passwordHash" TEXT, name TEXT, "createdAt" TIMESTAMP DEFAULT NOW(), "updatedAt" TIMESTAMP DEFAULT NOW())`,
+      `CREATE TABLE IF NOT EXISTS "Race" (id TEXT PRIMARY KEY, name TEXT, date TIMESTAMP, city TEXT, state TEXT, distances TEXT, organizer TEXT, status TEXT DEFAULT 'upcoming', "createdAt" TIMESTAMP DEFAULT NOW(), "updatedAt" TIMESTAMP DEFAULT NOW())`,
+      `CREATE TABLE IF NOT EXISTS "Athlete" (id TEXT PRIMARY KEY, name TEXT, "createdAt" TIMESTAMP DEFAULT NOW(), "updatedAt" TIMESTAMP DEFAULT NOW())`,
+      `CREATE TABLE IF NOT EXISTS "Result" (id TEXT PRIMARY KEY, "athleteId" TEXT, "raceId" TEXT, time TEXT, pace TEXT, "overallRank" INT, "genderRank" INT, "ageGroup" TEXT, distance TEXT, points INT DEFAULT 0)`,
+      `CREATE TABLE IF NOT EXISTS "CorridaAberta" (id TEXT PRIMARY KEY, nome TEXT, data TIMESTAMP, cidade TEXT, estado TEXT, distancias TEXT, "linkInscricao" TEXT, ativa BOOLEAN DEFAULT TRUE, "criadoEm" TIMESTAMP DEFAULT NOW(), "atualizadoEm" TIMESTAMP DEFAULT NOW())`
+    ];
+    for (const sql of tables) {
+      try { await prisma.$executeRawUnsafe(sql); } catch(err) {}
+    }
+    console.log('✅ Tabelas criadas!');
   }
   await prisma.$disconnect();
 }
@@ -49,7 +56,6 @@ const app = Fastify({ logger: false });
 
 await app.register(cors, { origin: true });
 
-// Serve static files from public
 const publicDir = path.join(__dirname, '../public');
 app.get('/regeni.css', async (req, reply) => {
   try { reply.type('text/css').header('Cache-Control','public,max-age=3600').send(fs.readFileSync(path.join(publicDir, 'regeni.css'), 'utf-8')); }
@@ -61,7 +67,6 @@ app.get('/manifest.json', async (req, reply) => {
   catch { reply.send('{}'); }
 });
 
-// HTML Pages - ler do diretório public interno
 const htmlCache = {};
 for (const pg of ['index','entrar','resultados','corridas-abertas']) {
   const file = pg === 'index' ? 'index.html' : `${pg}.html`;
@@ -78,7 +83,6 @@ for (const pg of ['index','entrar','resultados','corridas-abertas']) {
 }
 
 try {
-  await initDb();
   await app.register(authRoutes);
   await app.register(raceRoutes);
   await app.register(resultsRoutes);
