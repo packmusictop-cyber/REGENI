@@ -7,5 +7,4 @@ RUN npm ci
 RUN npx prisma generate
 COPY . .
 EXPOSE 8080
-CMD ["node", "src/index.js"]
-CMD ["node", "src/index.js"]
+CMD npx prisma db push --accept-data-loss --skip-generate && node scripts/import-data.cjs && node src/index.js

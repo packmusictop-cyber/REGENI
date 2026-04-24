@@ -3,10 +3,13 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "start": "npx prisma generate && node src/index.js",
+    "start": "npm run db:setup && node src/index.js",
     "dev": "node --watch src/index.js",
+    "db:setup": "prisma generate && prisma db push --accept-data-loss --skip-generate && node scripts/import-data.cjs",
+    "db:reset": "prisma db push --force-reset --accept-data-loss --skip-generate && node scripts/import-data.cjs",
     "db:push": "npx prisma db push --accept-data-loss",
-    "db:generate": "npx prisma generate"
+    "db:generate": "npx prisma generate",
+    "import:data": "node scripts/import-data.cjs"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.1",
@@ -16,7 +19,8 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.6.1",
     "fastify": "^4.28.1",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
     "prisma": "^5.22.0"
