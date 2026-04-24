@@ -71,7 +71,8 @@ async function importFile(filepath) {
   
   const validos = Array.isArray(dados) ? dados : [dados];
   const filtered = validos.filter(d => 
-    d.nome && d.tempo && d.tempo !== '00:00:00' && d.tempo.length >= 5
+    d.name && (d.liquidTime || d.rawTime) && 
+    d.liquidTime !== '00:00:00' && d.liquidTime?.length >= 5
   );
   
   if (filtered.length === 0) {
@@ -88,46 +89,49 @@ async function importFile(filepath) {
   const results = [];
   
   filtered.forEach(d => {
-    const raceId = 'race_' + h(d.slug || d.eventoId || d.eventoNome || filename);
+    const eventName = d.eventName || filename.replace(/_results/, '').replace(/-/g, ' ');
+    const raceId = 'race_' + h(eventName);
     if (!raceMap.has(raceId)) {
-      const parts = (d.eventoLocal || '').split('-').map(s => s.trim());
+      const raceDate = d.eventMainDate 
+        ? new Date(d.eventMainDate).toISOString().split('T')[0]
+        : d.eventMainDate || '2025-01-01';
       raceMap.set(raceId, {
         id: raceId,
-        name: esc(d.eventoNome || filename.replace(/_results/, '').replace(/-/g, ' ')),
-        date: d.eventoData || '2025-01-01',
-        city: esc(parts[0] || 'Sergipe'),
-        state: esc((parts[parts.length - 1] || 'SE').substring(0, 2).toUpperCase()),
-        distances: esc(d.distancia || '5K'),
-        organizer: esc(d.organizador || 'Central de Resultados'),
+        name: esc(eventName),
+        date: raceDate,
+        city: esc(d.eventCity || 'Sergipe'),
+        state: esc((d.eventUF || 'SE').substring(0, 2).toUpperCase()),
+        distances: esc(d.modality || '5KM'),
+        organizer: esc(d.organizer || 'Central de Resultados'),
         status: 'completed'
       });
     }
     
-    const athleteId = 'ath_' + h((d.nome || '').toUpperCase().trim() + (d.genero || 'M'));
+    const athleteId = 'ath_' + h((d.name || '').toUpperCase().trim() + (d.gender || 'M'));
     if (!athleteMap.has(athleteId)) {
       athleteMap.set(athleteId, {
         id: athleteId,
-        name: esc((d.nome || '').toUpperCase().trim()),
-        gender: (d.genero || 'M').substring(0, 1),
-        age: parseInt(d.idade) || null,
-        state: esc((d.estado || 'SE').substring(0, 2).toUpperCase()),
-        equipe: esc(d.equipe || ''),
-        city: esc(d.cidade || '')
+        name: esc((d.name || '').toUpperCase().trim()),
+        gender: (d.gender || 'M').substring(0, 1),
+        age: parseInt(d.age) || null,
+        state: esc((d.uf || d.eventUF || 'SE').substring(0, 2).toUpperCase()),
+        equipe: esc(d.team || ''),
+        city: esc(d.city || '')
       });
     }
     
     results.push({
-      id: 'res_' + h(raceId + athleteId + (d.distancia || '5K')),
+      id: 'res_' + h(raceId + athleteId + (d.modality || '5KM')),
       raceId,
       athleteId,
-      time: esc(d.tempo),
+      time: esc(d.liquidTime || d.rawTime || ''),
       pace: esc(d.pace || ''),
-      overallRank: parseInt(d.pos) || null,
-      genderRank: parseInt(d.posGenero) || null,
-      ageGroup: esc(d.faixa || ''),
-      distance: esc(d.distancia || '5K'),
+      overallRank: parseInt(d.generalPlacement) || null,
+      genderRank: parseInt(String(d.genderPlacement).replace(/[^0-9]/g, '')) || null,
+      ageGroup: esc(d.category || ''),
+      distance: esc(d.modality || '5KM'),
       points: 0,
-      source: esc(d.source || filename)
+      source: esc(filename)
     });
   });
   
