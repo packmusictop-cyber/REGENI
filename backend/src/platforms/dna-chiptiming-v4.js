@@ -1,25 +1,22 @@
-const ChipTimingDNA = {
+export const dna = {
   name: 'ChipTiming v4',
   format: 'json_nextjs',
-  fields: {
-    event: ['event.code', 'event.officialName', 'event.date', 'event.city', 'event.state'],
-    athlete: ['name', 'gender', 'age', 'bibNumber'],
-    result: ['netTime', 'time', 'place', 'ageGroup', 'teamName', 'modality.distance']
-  },
-  keys: {
-    event: 'event.code',
-    athlete: 'bibNumber_name'
-  },
-  parsers: ['fetchEventPage', 'fetchListEntries', 'selectLists'],
-  normalization: {
-    time: 'fmtTime',
-    distance: 'normDist',
-    pace: 'timeSec_km',
-    name: 'UPPERCASE'
-  },
-  sanityChecks: ['pace_min_2:31_per_km', 'pace_max_20:00'],
-  dependencies: ['https', 'crypto', 'dotenv'],
-  adapter: 'adapters/chiptiming.js'
+  
+  // A lógica de força bruta que estava no seu Railway
+  parser: (html) => {
+    try {
+      const parts = html.split('__NEXT_DATA__" type="application/json">');
+      const jsonStr = parts[1].split('</script>')[0];
+      const data = JSON.parse(jsonStr);
+      
+      return data.props.pageProps.results.map(r => ({
+        title: r.event.officialName,
+        date: r.event.date,
+        location: r.event.city,
+        link: `https://chiptiming.com.br{r.event.code}`
+      }));
+    } catch (e) {
+      return null; // Retorna null se falhar na "pesca"
+    }
+  }
 };
-
-export const dna = ChipTimingDNA;

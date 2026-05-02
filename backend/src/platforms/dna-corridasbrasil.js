@@ -1,37 +1,20 @@
-/**
- * DNA Tecnico: CorridasBrasil (Agregador)
- */
-
-const CorridasBrasilDNA = {
+export const dna = {
   name: 'CorridasBrasil (Agregador)',
-  format: 'HTML scraping (multi-source)',
-  baseUrl: 'https://www.corridasbrasil.com.br',
-  fontesAgregadas: ['Sympla', 'TicketSports', 'WebRun', 'MinhasInscricoes', 'Chipower', 'RunnerBrasil'],
-  fields: {
-    event: ['nome', 'data (DD/MM/YYYY)', 'cidade', 'estado (UF)', 'distancias', 'link'],
-    athlete: 'NAO ENTREGA (apenas lista eventos futuros)',
-    result: 'NAO ENTREGA (apenas lista eventos futuros)'
-  },
-  keys: {
-    event: 'nome + data + cidade',
-    athlete: 'Nao ha (nao entrega resultados)'
-  },
-  parsers: ['Scraper listagem eventos', 'Extrai nome, data, cidade via HTML'],
-  normalization: {
-    time: 'Nao ha',
-    distance: 'texto evento → normDist → 5K,10K,etc.',
-    pace: 'Nao ha',
-    name: 'UPPERCASE'
-  },
-  particularidades: [
-    'APENAS LISTA EVENTOS (nao ha resultados)',
-    'Agregador: ponte entre usuario e fontes originais',
-    'Cada fonte tem parser proprio (Next.js, React, etc.)'
-  ],
-  sanityChecks: ['Data DD/MM/YYYY', 'UF duas letras maiusculas'],
-  dependencies: ['https', 'Cheerio ou regex'],
-  adapter: 'adapters/aggregator.js (apenas eventos)'
+  format: 'HTML',
+  
+  // A "Mão" de Pesca: Extrai o título e gera os dados
+  parser: (html) => {
+    // Busca o texto entre as tags <title>
+    const match = html.match(/<title>(.*?)<\/title>/i);
+    const rawTitle = match ? match[1] : 'Corrida Desconhecida';
+    const cleanTitle = rawTitle.split('|')[0].trim();
+
+    return [{
+      title: cleanTitle,
+      date: '2026-05-15', // Exemplo (podemos automatizar depois)
+      location: 'Brasil',
+      link: 'https://corridasbrasil.com.br' + Math.random().toString(36).substring(7),
+      origin: 'CorridasBrasil'
+    }];
+  }
 };
-
-export const dna = CorridasBrasilDNA; 
-
