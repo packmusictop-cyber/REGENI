@@ -1,133 +1,133 @@
 ---
-description: Instructions building apps with MCP
+description: Instruções para construção de aplicativos com MCP
 globs: *
 alwaysApply: true
 ---
 
-# InsForge SDK Documentation - Overview
+# Documentação do InsForge SDK - Visão Geral
 
-## What is InsForge?
+## O que é o InsForge?
 
-Backend-as-a-service (BaaS) platform providing:
+Plataforma Backend-as-a-service (BaaS) que oferece:
 
-- **Database**: PostgreSQL with PostgREST API
-- **Authentication**: Email/password + OAuth (Google, GitHub)
-- **Storage**: File upload/download
-- **AI**: Chat completions and image generation (OpenAI-compatible)
-- **Functions**: Serverless function deployment
-- **Realtime**: WebSocket pub/sub (database + client events)
+- **Banco de Dados**: PostgreSQL com API PostgREST
+- **Autenticação**: Email/senha + OAuth (Google, GitHub)
+- **Armazenamento**: Upload/download de arquivos
+- **IA**: Completações de chat e geração de imagens (compatível com OpenAI)
+- **Funções**: Implantação de funções serverless
+- **Tempo Real**: Pub/sub via WebSocket (banco de dados + eventos do cliente)
 
-## Installation
+## Instalação
 
-The following is a step-by-step guide to installing and using the InsForge TypeScript SDK for Web applications. If you are building other types of applications, please refer to:
-- [Swift SDK documentation](/sdks/swift/overview) for iOS, macOS, tvOS, and watchOS applications.
-- [Kotlin SDK documentation](/sdks/kotlin/overview) for Android applications.
-- [REST API documentation](/sdks/rest/overview) for direct HTTP API access.
+O seguinte é um guia passo a passo para instalar e usar o SDK TypeScript do InsForge para aplicações Web. Se você está construindo outros tipos de aplicações, consulte:
+- [Documentação Swift SDK](/sdks/swift/overview) para aplicações iOS, macOS, tvOS e watchOS.
+- [Documentação Kotlin SDK](/sdks/kotlin/overview) para aplicações Android.
+- [Documentação REST API](/sdks/rest/overview) para acesso direto via HTTP.
 
-### 🚨 CRITICAL: Follow these steps in order
+### 🚨 CRÍTICO: Siga estes passos na ordem
 
-### Step 1: Download Template
+### Passo 1: Baixar Template
 
-Use the `download-template` MCP tool to create a new project with your backend URL and anon key pre-configured.
+Use a ferramenta MCP `download-template` para criar um novo projeto com sua URL backend e chave anon pré-configuradas.
 
-### Step 2: Install SDK
+### Passo 2: Instalar SDK
 
 ```bash
 npm install @insforge/sdk@latest
 ```
 
-### Step 3: Create SDK Client
+### Passo 3: Criar Cliente SDK
 
-You must create a client instance using `createClient()` with your base URL and anon key:
+Você deve criar uma instância do cliente usando `createClient()` com sua URL base e chave anon:
 
 ```javascript
 import { createClient } from '@insforge/sdk';
 
 const client = createClient({
-  baseUrl: 'https://your-app.region.insforge.app',  // Your InsForge backend URL
-  anonKey: 'your-anon-key-here'       // Get this from backend metadata
+  baseUrl: 'https://seu-app.regiao.insforge.app',  // Sua URL backend do InsForge
+  anonKey: 'sua-chave-anon-aqui'       // Obtenha isso nos metadados do backend
 });
 
 ```
 
-**API BASE URL**: Your API base URL is `https://your-app.region.insforge.app`.
+**URL BASE DA API**: Sua URL base da API é `https://seu-app.regiao.insforge.app`.
 
-## Getting Detailed Documentation
+## Obtendo Documentação Detalhada
 
-### 🚨 CRITICAL: Always Fetch Documentation Before Writing Code
+### 🚨 CRÍTICO: Sempre Busque a Documentação Antes de Escrever Código
 
-InsForge provides official SDKs and REST APIs, use them to interact with InsForge services from your application code.
+O InsForge fornece SDKs oficiais e APIs REST, use-os para interagir com os serviços do InsForge a partir do código da sua aplicação.
 
-- [TypeScript SDK](/sdks/typescript/overview) - JavaScript/TypeScript
-- [Swift SDK](/sdks/swift/overview) - iOS, macOS, tvOS, and watchOS
-- [Kotlin SDK](/sdks/kotlin/overview) - Android and Kotlin Multiplatform
-- [REST API](/sdks/rest/overview) - Direct HTTP API access
+- [SDK TypeScript](/sdks/typescript/overview) - JavaScript/TypeScript
+- [SDK Swift](/sdks/swift/overview) - iOS, macOS, tvOS e watchOS
+- [SDK Kotlin](/sdks/kotlin/overview) - Android e Kotlin Multiplatform
+- [REST API](/sdks/rest/overview) - Acesso direto via HTTP
 
-Before writing or editing any InsForge integration code, you **MUST** call the `fetch-docs` or `fetch-sdk-docs` MCP tool to get the latest SDK documentation. This ensures you have accurate, up-to-date implementation patterns.
+Antes de escrever ou editar qualquer código de integração com o InsForge, você **DEVE** chamar a ferramenta MCP `fetch-docs` ou `fetch-sdk-docs` para obter a documentação mais recente do SDK. Isso garante que você tenha padrões de implementação precisos e atualizados.
 
-### Use the InsForge `fetch-docs` MCP tool to get specific SDK documentation:
+### Use a ferramenta MCP `fetch-docs` do InsForge para obter documentação específica do SDK:
 
-Available documentation types:
+Tipos de documentação disponíveis:
 
-- `"instructions"` - Essential backend setup (START HERE)
-- `"real-time"` - Real-time pub/sub (database + client events) via WebSockets
-- `"db-sdk-typescript"` - Database operations with TypeScript SDK
-- **Authentication** - Choose based on implementation:
-  - `"auth-sdk-typescript"` - TypeScript SDK methods for custom auth flows
-  - `"auth-components-react"` - Pre-built auth UI for React+Vite (singlepage App)
-  - `"auth-components-react-router"` - Pre-built auth UI for React(Vite+React Router) (Multipage App)
-  - `"auth-components-nextjs"` - Pre-built auth UI for Nextjs (SSR App)
-- `"storage-sdk"` - File storage operations
-- `"functions-sdk"` - Serverless functions invocation
-- `"ai-integration-sdk"` - AI chat and image generation
-- `"real-time"` - Real-time pub/sub (database + client events) via WebSockets
-- `"deployment"` - Deploy frontend applications via MCP tool
+- `"instructions"` - Configuração essencial do backend (COMECE AQUI)
+- `"real-time"` - Pub/sub em tempo real (banco de dados + eventos) via WebSockets
+- `"db-sdk-typescript"` - Operações de banco de dados com SDK TypeScript
+- **Autenticação** - Escolha com base na implementação:
+  - `"auth-sdk-typescript"` - Métodos SDK TypeScript para fluxos de auth customizados
+  - `"auth-components-react"` - UI de auth pré-construída para React+Vite (Single Page App)
+  - `"auth-components-react-router"` - UI de auth pré-construída para React (Vite+React Router) (Multi Page App)
+  - `"auth-components-nextjs"` - UI de auth pré-construída para Nextjs (App SSR)
+- `"storage-sdk"` - Operações de armazenamento de arquivos
+- `"functions-sdk"` - Invocação de funções serverless
+- `"ai-integration-sdk"` - Chat de IA e geração de imagens
+- `"real-time"` - Pub/sub em tempo real (banco de dados + eventos) via WebSockets
+- `"deployment"` - Implantar aplicações frontend via ferramenta MCP
 
-These documentations are mostly for TypeScript SDK. For other languages, you can also use `fetch-sdk-docs` mcp tool to get specific documentation.
+Estas documentações são maioritariamente para SDK TypeScript. Para outras linguagens, você também pode usar a ferramenta MCP `fetch-sdk-docs` para obter documentação específica.
 
-### Use the InsForge `fetch-sdk-docs` MCP tool to get specific SDK documentation
+### Use a ferramenta MCP `fetch-sdk-docs` do InsForge para obter documentação específica do SDK
 
-You can fetch sdk documentation using the `fetch-sdk-docs` MCP tool with specific feature type and language.
+Você pode buscar documentação do SDK usando a ferramenta MCP `fetch-sdk-docs` com tipo de recurso e linguagem específicos.
 
-Available feature types:
-- db - Database operations
-- storage - File storage operations
-- functions - Serverless functions invocation
-- auth - User authentication
-- ai - AI chat and image generation
-- realtime - Real-time pub/sub (database + client events) via WebSockets
+Tipos de recursos disponíveis:
+- db - Operações de banco de dados
+- storage - Operações de armazenamento de arquivos
+- functions - Invocação de funções serverless
+- auth - Autenticação de usuários
+- ai - Chat de IA e geração de imagens
+- realtime - Pub/sub em tempo real (banco de dados + eventos) via WebSockets
 
-Available languages:
-- typescript - JavaScript/TypeScript SDK
-- swift - Swift SDK (for iOS, macOS, tvOS, and watchOS)
-- kotlin - Kotlin SDK (for Android and JVM applications)
+Linguagens disponíveis:
+- typescript - SDK JavaScript/TypeScript
+- swift - SDK Swift (para iOS, macOS, tvOS e watchOS)
+- kotlin - SDK Kotlin (para aplicações Android e JVM)
 - rest-api - REST API
 
-## When to Use SDK vs MCP Tools
+## Quando Usar SDK vs Ferramentas MCP
 
-### Always SDK for Application Logic:
+### Sempre SDK para Lógica de Aplicação:
 
-- Authentication (register, login, logout, profiles)
-- Database CRUD (select, insert, update, delete)
-- Storage operations (upload, download files)
-- AI operations (chat, image generation)
-- Serverless function invocation
+- Autenticação (registro, login, logout, perfis)
+- CRUD de banco de dados (select, insert, update, delete)
+- Operações de armazenamento (upload, download de arquivos)
+- Operações de IA (chat, geração de imagens)
+- Invocação de funções serverless
 
-### Use MCP Tools for Infrastructure:
+### Use Ferramentas MCP para Infraestrutura:
 
-- Project scaffolding (`download-template`) - Download starter templates with InsForge integration
-- Backend setup and metadata (`get-backend-metadata`)
-- Database schema management (`run-raw-sql`, `get-table-schema`)
-- Storage bucket creation (`create-bucket`, `list-buckets`, `delete-bucket`)
-- Serverless function deployment (`create-function`, `update-function`, `delete-function`)
-- Frontend deployment (`create-deployment`) - Deploy frontend apps to InsForge hosting
+- Estruturação de projeto (`download-template`) - Baixar templates iniciais com integração InsForge
+- Configuração de backend e metadados (`get-backend-metadata`)
+- Gerenciamento de esquema de banco de dados (`run-raw-sql`, `get-table-schema`)
+- Criação de buckets de armazenamento (`create-bucket`, `list-buckets`, `delete-bucket`)
+- Implantação de funções serverless (`create-function`, `update-function`, `delete-function`)
+- Implantação de frontend (`create-deployment`) - Implantar aplicações frontend no hosting do InsForge
 
-## Important Notes
+## Notas Importantes
 
-- For auth: use `auth-sdk` for custom UI, or framework-specific components for pre-built UI
-- SDK returns `{data, error}` structure for all operations
-- Database inserts require array format: `[{...}]`
-- Serverless functions have single endpoint (no subpaths)
-- Storage: Upload files to buckets, store URLs in database
-- AI operations are OpenAI-compatible
-- **EXTRA IMPORTANT**: Use Tailwind CSS 3.4 (do not upgrade to v4). Lock these dependencies in `package.json`
+- Para auth: use `auth-sdk` para UI customizada, ou componentes específicos de framework para UI pré-construída
+- SDK retorna estrutura `{data, error}` para todas as operações
+- Inserções no banco de dados requerem formato array: `[{...}]`
+- Funções serverless têm um único endpoint (sem subpaths)
+- Armazenamento: Faça upload de arquivos para buckets, armazene URLs no banco de dados
+- Operações de IA são compatíveis com OpenAI
+- **EXTRA IMPORTANTE**: Use Tailwind CSS 3.4 (não atualize para v4). Bloqueie estas dependências no `package.json`
