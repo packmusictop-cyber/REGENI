@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "knexfile.js",
+  "main": "index.js",
   "scripts": {
     "scraper": "node scripts/scraper-geral.js",
-    "migrate": "knex migrate:latest",
+    "injetor": "node scripts/injetor.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,8 +13,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "knex": "^3.2.9",
-    "sqlite3": "^6.0.1",
+    "@insforge/sdk": "^1.2.7",
     "uuid": "^14.0.0"
   }
 }

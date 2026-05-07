@@ -1,0 +1,27 @@
+  
+# Environment variables (contains API keys)
+.env
+
+# InsForge & AI agent skills
+.insforge
+.agent
+.agents
+.augment
+.claude
+.cline
+.github/copilot*
+.kilocode
+.qoder
+.qwen
+.roo
+.trae
+.windsurf
+
+# OpenCode config (contains API keys)
+opencode.json
+
+# Dependencies
+node_modules/
+
+# Data files (generated content)
+data/
